@@ -37,7 +37,7 @@ const Dispositivos = () => {
             </div>
           </div>
 
-          <Table className="border border-neutral-200 ">
+          <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Nome</TableHead>
