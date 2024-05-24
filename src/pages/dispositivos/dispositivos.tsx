@@ -1,6 +1,13 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination'
+import {
   Table,
   TableBody,
   TableCell,
@@ -18,8 +25,7 @@ const Dispositivos = () => {
   useEffect(() => {
     request('http://localhost:8080/dispositivo/1', {
       headers: {
-        Authorization:
-          'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJpb3QtYXBpIiwic3ViIjoiamFpbHNvbkBnbWFpbC5jb20iLCJmdW5jYW8iOiJVU1VBUklPIiwiZXhwIjoxNzE2NjAxMTc0fQ.QR1LFUTRp9WSkJ_zVif-KR5TQ9Et0UsZuJBD-3jPyl4',
+        Authorization: 'Bearer ',
       },
     })
   }, [request])
@@ -50,7 +56,7 @@ const Dispositivos = () => {
             </div>
           </div>
 
-          <Table>
+          <Table className="h-full">
             <TableHeader>
               <TableRow>
                 <TableHead>Nome</TableHead>
@@ -62,16 +68,34 @@ const Dispositivos = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableRow>
-                <TableCell>Exemplo</TableCell>
-                <TableCell>Exemplo</TableCell>
-                <TableCell>Exemplo</TableCell>
-                <TableCell>Exemplo</TableCell>
-                <TableCell>Exemplo</TableCell>
-                <TableCell>Exemplo</TableCell>
-              </TableRow>
+              {!data && (
+                <div className="flex flex-col justify-center items-center h-full w-full text-center gap-[10px]">
+                  <p className="text-lg font-semibold">
+                    Eita! Não encontrei nada por aqui
+                  </p>
+                  <span className="text-sm">
+                    Que tal deixar isso aqui menos vazio e começar a adicionar
+                    seus dispositivos?
+                  </span>
+                  <Button>
+                    <CirclePlus className="mr-2" size="16" />
+                    Adicionar Dispositivo
+                  </Button>
+                </div>
+              )}
             </TableBody>
           </Table>
+
+          <Pagination className="flex justify-end">
+            <PaginationContent className="text-neutral-500">
+              <PaginationItem>
+                <PaginationPrevious href="#" />
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationNext href="#" />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
         </main>
       </div>
     </>
