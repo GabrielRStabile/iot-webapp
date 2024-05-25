@@ -22,21 +22,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import useFetch from '@/hooks/useFetch'
 import { CirclePlus, FileSpreadsheet } from 'lucide-react'
-import { useEffect } from 'react'
 
 const Dispositivos = () => {
-  const { data, loading, error, request } = useFetch()
-
-  useEffect(() => {
-    request('http://localhost:8080/dispositivo/1', {
-      headers: {
-        Authorization: 'Bearer ',
-      },
-    })
-  }, [request])
-
   return (
     <>
       <div className="bg-neutral-50 p-4 h-screen">
@@ -93,25 +81,23 @@ const Dispositivos = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {!data && (
-                <TableRow>
-                  <TableCell colSpan={6}>
-                    <div className="text-center flex flex-col justify-center items-center gap-[0.625rem]">
-                      <p className="text-lg font-semibold">
-                        Eita! Não encontrei nada por aqui
-                      </p>
-                      <span className="text-sm block">
-                        Que tal deixar isso aqui menos vazio e começar a
-                        adicionar seus dispositivos?
-                      </span>
-                      <Button>
-                        <CirclePlus className="mr-2" size="16" />
-                        Adicionar Dispositivo
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              )}
+              <TableRow>
+                <TableCell colSpan={6}>
+                  <div className="text-center flex flex-col justify-center items-center gap-[0.625rem]">
+                    <p className="text-lg font-semibold">
+                      Eita! Não encontrei nada por aqui
+                    </p>
+                    <span className="text-sm block">
+                      Que tal deixar isso aqui menos vazio e começar a adicionar
+                      seus dispositivos?
+                    </span>
+                    <Button>
+                      <CirclePlus className="mr-2" size="16" />
+                      Adicionar Dispositivo
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
             </TableBody>
           </Table>
 
