@@ -1,5 +1,12 @@
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { Search } from '@/components/ui/input'
 import {
   Pagination,
   PaginationContent,
@@ -17,7 +24,7 @@ import {
 } from '@/components/ui/table'
 import useFetch from '@/hooks/useFetch'
 import { CirclePlus, FileSpreadsheet } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 
 const Dispositivos = () => {
   const { data, loading, error, request } = useFetch()
@@ -33,7 +40,22 @@ const Dispositivos = () => {
   return (
     <>
       <div className="bg-neutral-50 p-4 h-screen">
-        <main className="flex flex-col gap-[0.625rem] bg-white border border-solid border-neutral-200 rounded-md p-6 h-full">
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink>Início</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink>Dispositivos</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink>Todos os Dispositivos</BreadcrumbLink>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+        <main className="flex flex-col gap-[0.625rem] bg-white border border-solid border-neutral-200 rounded-md mt-3 p-6 h-full">
           <div>
             <h4 className="scroll-m-20 text-xl font-semibold tracking-tight">
               Dispositivos
@@ -43,7 +65,10 @@ const Dispositivos = () => {
             </span>
           </div>
           <div className="flex justify-between">
-            <Input className="flex-1 max-w-sm" />
+            <Search
+              className="flex-1 max-w-sm"
+              placeholder="Pesquise pelo nome"
+            />
             <div>
               <Button variant="outline" className="mr-[0.625rem]">
                 <FileSpreadsheet className="mr-2" size="16" />
@@ -69,19 +94,23 @@ const Dispositivos = () => {
             </TableHeader>
             <TableBody>
               {!data && (
-                <div className="flex flex-col justify-center items-center h-full w-full text-center gap-[10px]">
-                  <p className="text-lg font-semibold">
-                    Eita! Não encontrei nada por aqui
-                  </p>
-                  <span className="text-sm">
-                    Que tal deixar isso aqui menos vazio e começar a adicionar
-                    seus dispositivos?
-                  </span>
-                  <Button>
-                    <CirclePlus className="mr-2" size="16" />
-                    Adicionar Dispositivo
-                  </Button>
-                </div>
+                <TableRow>
+                  <TableCell colSpan={6}>
+                    <div className="text-center flex flex-col justify-center items-center gap-[0.625rem]">
+                      <p className="text-lg font-semibold">
+                        Eita! Não encontrei nada por aqui
+                      </p>
+                      <span className="text-sm block">
+                        Que tal deixar isso aqui menos vazio e começar a
+                        adicionar seus dispositivos?
+                      </span>
+                      <Button>
+                        <CirclePlus className="mr-2" size="16" />
+                        Adicionar Dispositivo
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
               )}
             </TableBody>
           </Table>
