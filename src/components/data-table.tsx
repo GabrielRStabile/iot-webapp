@@ -1,7 +1,9 @@
 import {
   ColumnDef,
+  ColumnFiltersState,
   flexRender,
   getCoreRowModel,
+  getFilteredRowModel,
   getPaginationRowModel,
   useReactTable,
 } from '@tanstack/react-table'
@@ -14,7 +16,14 @@ import {
   TableRow,
 } from './ui/table'
 import { Button } from './ui/button'
-import { ChevronLeft, ChevronRight, CirclePlus } from 'lucide-react'
+import {
+  ChevronLeft,
+  ChevronRight,
+  CirclePlus,
+  FileSpreadsheet,
+} from 'lucide-react'
+import { useState } from 'react'
+import { Search } from './ui/input'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -27,11 +36,18 @@ export function DataTable<TData, TValue>({
   data,
   dataType,
 }: DataTableProps<TData, TValue>) {
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    onColumnFiltersChange: setColumnFilters,
+    getFilteredRowModel: getFilteredRowModel(),
+    state: {
+      columnFilters,
+    },
   })
 
   const types = {
@@ -43,6 +59,26 @@ export function DataTable<TData, TValue>({
 
   return (
     <div>
+      <div className="flex justify-between mb-[0.625rem]">
+        <Search
+          className="flex-1 max-w-sm"
+          placeholder="Pesquise pelo nome"
+          value={(table.getColumn('nome')?.getFilterValue() as string) ?? ''}
+          onChange={(event) =>
+            table.getColumn('nome')?.setFilterValue(event.target.value)
+          }
+        />
+        <div>
+          <Button variant="outline" className="mr-[0.625rem]">
+            <FileSpreadsheet className="mr-2" size="16" />
+            Exportar
+          </Button>
+          <Button className="capitalize">
+            <CirclePlus className="mr-2" size="16" />
+            Adicionar {dataType}
+          </Button>
+        </div>
+      </div>
       <div className="rounded-md border">
         <Table>
           <TableHeader>

@@ -5,10 +5,8 @@ import {
   BreadcrumbList,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb'
-import { Button } from '@/components/ui/button'
-import { Search } from '@/components/ui/input'
+
 import ThemeSwitcher from '@/components/ui/theme-switcher'
-import { CirclePlus, FileSpreadsheet } from 'lucide-react'
 
 const Dispositivos = () => {
   return (
@@ -39,23 +37,8 @@ const Dispositivos = () => {
               Gerencie e adicione mais dispositivos em seus gateways.
             </span>
           </div>
-          <div className="flex justify-between">
-            <Search
-              className="flex-1 max-w-sm"
-              placeholder="Pesquise pelo nome"
-            />
-            <div>
-              <Button variant="outline" className="mr-[0.625rem]">
-                <FileSpreadsheet className="mr-2" size="16" />
-                Exportar
-              </Button>
-              <Button>
-                <CirclePlus className="mr-2" size="16" />
-                Adicionar Dispositivo
-              </Button>
-            </div>
-          </div>
-          {/* {data && (
+          {/* 
+          {data && (
             <DataTable
               columns={dispositivoColumns}
               data={data}
