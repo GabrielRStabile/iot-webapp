@@ -40,12 +40,7 @@ const Dispositivos = () => {
   const { data, error, loading, request } = useFetch<Dispositivo[]>()
 
   useEffect(() => {
-    request('http://localhost:8080/dispositivo', {
-      headers: {
-        Authorization:
-          'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJpb3QtYXBpIiwic3ViIjoiamFpbHNvbkBnbWFpbC5jb20iLCJmdW5jYW8iOiJVU1VBUklPIiwiZXhwIjoxNzE2NzQ4Nzk5fQ.Sd2CTni6Z2sfMEvcmW3SALOQGbmIgdPbrZuyqYvAt4o',
-      },
-    })
+    request('http://localhost:8080/dispositivo')
   }, [request])
 
   const renderTable = () => {

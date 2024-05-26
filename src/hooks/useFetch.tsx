@@ -1,9 +1,11 @@
+import fetchClient from '@/services/fetch-client'
+import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
 import { useCallback, useState } from 'react'
 
-interface FetchOptions extends RequestInit {}
+interface FetchOptions extends AxiosRequestConfig {}
 
 interface FetchResponse<T> {
-  response: Response | null
+  response: AxiosResponse<T> | null
   json: T | null
 }
 
@@ -21,19 +23,35 @@ const useFetch = <T = unknown,>(): UseFetch<T> => {
 
   const request = useCallback(
     async (url: string, options?: FetchOptions): Promise<FetchResponse<T>> => {
-      let response: Response | null = null
+      let response: AxiosResponse<T> | null = null
       let json: T | null = null
 
       try {
         setError(null)
         setLoading(true)
-        response = await fetch(url, options)
-        json = await response.json()
-        if (!response.ok) throw new Error(json as unknown as string)
+
+        const axiosOptions = {
+          method: options?.method ?? 'GET',
+          url: url,
+          headers: options?.headers,
+          data: options?.data,
+        }
+
+        response = await fetchClient().request<T>(axiosOptions)
+        json = response.data
+
         setData(json)
       } catch (err) {
+        if (axios.isAxiosError(err)) {
+          const axiosError = err.response
+          if (axiosError && axiosError.status === 403) {
+            console.log('redirect')
+          }
+          setError(axiosError?.data?.message)
+        } else {
+          setError((err as Error).message)
+        }
         json = null
-        setError((err as Error).message)
       } finally {
         setLoading(false)
       }
