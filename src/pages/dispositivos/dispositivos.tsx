@@ -26,15 +26,7 @@ import ThemeSwitcher from '@/components/ui/theme-switcher'
 import useFetch from '@/hooks/useFetch'
 import { CirclePlus, Edit, Eye, FileSpreadsheet, Trash } from 'lucide-react'
 import { useEffect } from 'react'
-
-interface Dispositivo {
-  id: number
-  nome: string
-  descricao: string
-  endereco: string
-  local: string
-  gatewayId: number | null
-}
+import Dispositivo from '@/domain/dispositivo/dispositivo-interface'
 
 const Dispositivos = () => {
   const { data, error, loading, request } = useFetch<Dispositivo[]>()
