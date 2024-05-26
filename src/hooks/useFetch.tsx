@@ -32,7 +32,7 @@ const useFetch = <T = unknown,>(): UseFetch<T> => {
 
         const axiosOptions = {
           method: options?.method ?? 'GET',
-          url: url,
+          url,
           headers: options?.headers,
           data: options?.data,
         }
