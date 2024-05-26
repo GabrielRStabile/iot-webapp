@@ -1,4 +1,3 @@
-import { DataTable } from '@/components/data-table'
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -8,7 +7,6 @@ import {
 } from '@/components/ui/breadcrumb'
 
 import ThemeSwitcher from '@/components/ui/theme-switcher'
-import { dispositivoColumns } from '@/domain/dispositivo/dispositivo-columns'
 
 const Dispositivos = () => {
   return (
