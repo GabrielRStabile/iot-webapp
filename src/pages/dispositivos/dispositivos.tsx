@@ -9,24 +9,16 @@ import {
 
 import ThemeSwitcher from '@/components/ui/theme-switcher'
 import { dispositivoColumns } from '@/domain/dispositivo/dispositivo-columns'
-import { useEffect, useState } from 'react'
+import Dispositivo from '@/domain/dispositivo/dispositivo-interface'
+import useFetch from '@/hooks/useFetch'
+import { useEffect } from 'react'
 
 const Dispositivos = () => {
-  const [data, setData] = useState(null)
+  const { data, request } = useFetch<Dispositivo[]>()
 
   useEffect(() => {
-    async function getData() {
-      const res = await fetch('http://localhost:8080/dispositivo', {
-        headers: {
-          Authorization:
-            'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJpb3QtYXBpIiwic3ViIjoiamFpbHNvbkBnbWFpbC5jb20iLCJmdW5jYW8iOiJVU1VBUklPIiwiZXhwIjoxNzE2ODM3NjEyfQ.6LtPX0ImCWV3lsPv7M0DVH1_tRjIfz-q5TYKeTClu2M',
-        },
-      })
-      const json = await res.json()
-      setData(json)
-    }
-    getData()
-  }, [])
+    request('http://localhost:8080/dispositivo')
+  }, [request])
 
   return (
     <>

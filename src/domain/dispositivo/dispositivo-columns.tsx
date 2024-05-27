@@ -60,6 +60,12 @@ export const dispositivoColumns: ColumnDef<Dispositivo>[] = [
     id: 'actions',
     header: 'Ações',
     cell: () => {
+      // const dispositivoId = row.original.id
+
+      // const handleDelete = async (id : number) => {
+
+      // }
+
       return (
         <div className="flex gap-[0.625rem]">
           <Button variant="outline" className="py-2 px-3">
