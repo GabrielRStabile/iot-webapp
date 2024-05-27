@@ -1,3 +1,4 @@
+import { DataTable } from '@/components/data-table'
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -7,8 +8,26 @@ import {
 } from '@/components/ui/breadcrumb'
 
 import ThemeSwitcher from '@/components/ui/theme-switcher'
+import { dispositivoColumns } from '@/domain/dispositivo/dispositivo-columns'
+import { useEffect, useState } from 'react'
 
 const Dispositivos = () => {
+  const [data, setData] = useState(null)
+
+  useEffect(() => {
+    async function getData() {
+      const res = await fetch('http://localhost:8080/dispositivo', {
+        headers: {
+          Authorization:
+            'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJpb3QtYXBpIiwic3ViIjoiamFpbHNvbkBnbWFpbC5jb20iLCJmdW5jYW8iOiJVU1VBUklPIiwiZXhwIjoxNzE2ODM3NjEyfQ.6LtPX0ImCWV3lsPv7M0DVH1_tRjIfz-q5TYKeTClu2M',
+        },
+      })
+      const json = await res.json()
+      setData(json)
+    }
+    getData()
+  }, [])
+
   return (
     <>
       <div className="bg-neutral-50 p-4 h-screen">
@@ -37,14 +56,14 @@ const Dispositivos = () => {
               Gerencie e adicione mais dispositivos em seus gateways.
             </span>
           </div>
-          {/* 
+
           {data && (
             <DataTable
               columns={dispositivoColumns}
               data={data}
               dataType="dispositivo"
             />
-          )} */}
+          )}
         </main>
       </div>
     </>
