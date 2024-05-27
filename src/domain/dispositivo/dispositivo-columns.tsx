@@ -3,7 +3,9 @@ import Dispositivo from './dispositivo-interface'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Button } from '@/components/ui/button'
-import { Edit, Eye, Trash } from 'lucide-react'
+import { Edit, Eye } from 'lucide-react'
+import ConfirmDeleteDialog from '@/components/confirm-delete-dialog'
+import useFetch from '@/hooks/useFetch'
 
 export const dispositivoColumns: ColumnDef<Dispositivo>[] = [
   {
@@ -59,18 +61,20 @@ export const dispositivoColumns: ColumnDef<Dispositivo>[] = [
   {
     id: 'actions',
     header: 'Ações',
-    cell: () => {
-      // const dispositivoId = row.original.id
+    cell: function CellComponent({ row }) {
+      const dispositivoId = row.original.id
+      const { error, request } = useFetch()
 
-      // const handleDelete = async (id : number) => {
-
-      // }
+      const handleDelete = () => {
+        request(`http://localhost:8080/dispositivo/${dispositivoId}`, {
+          method: 'DELETE',
+        })
+        if (error) console.log(error)
+      }
 
       return (
         <div className="flex gap-[0.625rem]">
-          <Button variant="outline" className="py-2 px-3">
-            <Trash size="16" />
-          </Button>
+          <ConfirmDeleteDialog onConfirm={handleDelete} />
           <Button variant="outline" className="py-2 px-3">
             <Eye size="16" />
           </Button>
