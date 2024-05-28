@@ -11,6 +11,8 @@ import ThemeSwitcher from '@/components/ui/theme-switcher'
 import { dispositivoColumns } from '@/domain/dispositivo/dispositivo-columns'
 import { useQuery } from '@tanstack/react-query'
 import { getDispositivos } from '@/domain/dispositivo/dispositivo-queries'
+import { Outlet, useLocation } from 'react-router-dom'
+import DispositivoCreatePage from './dispositivo-create'
 
 const DispositivosPage = () => {
   const { data } = useQuery({
@@ -18,9 +20,19 @@ const DispositivosPage = () => {
     queryFn: getDispositivos,
   })
 
+  const location = useLocation()
+
+  if (location.pathname === '/dispositivos/new') {
+    return <DispositivoCreatePage />
+  }
+
   return (
     <>
       <div className="bg-neutral-50 p-4 h-full">
+        <Outlet />
+        {location.pathname === '/dispositivos/new' ? (
+          <DispositivoCreatePage />
+        ) : null}
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>

@@ -9,6 +9,7 @@ import App from './pages/app'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClient } from './lib/react-query'
 import DispositivosPage from './pages/dispositivos/dispositivos'
+import DispositivoCreatePage from './pages/dispositivos/dispositivo-create'
 
 const router = createBrowserRouter([
   {
@@ -28,6 +29,12 @@ const router = createBrowserRouter([
   {
     path: '/dispositivos',
     element: <DispositivosPage />,
+    children: [
+      {
+        path: 'new',
+        element: <DispositivoCreatePage />,
+      },
+    ],
   },
 ])
 
