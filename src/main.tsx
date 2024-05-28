@@ -6,9 +6,10 @@ import Root from './components/ui/root'
 import { TooltipProvider } from './components/ui/tooltip'
 import './index.css'
 import App from './pages/app'
-import Dispositivos from './pages/dispositivos/dispositivos'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClient } from './lib/react-query'
+import DispositivosPage from './pages/dispositivos/dispositivos'
+
 const router = createBrowserRouter([
   {
     path: '/',
@@ -26,7 +27,7 @@ const router = createBrowserRouter([
   },
   {
     path: '/dispositivos',
-    element: <Dispositivos />,
+    element: <DispositivosPage />,
   },
 ])
 

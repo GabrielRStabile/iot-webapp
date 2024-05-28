@@ -14,7 +14,7 @@ import fetchClient from '@/services/fetch-client'
 // import { useQuery } from '@tanstack/react-query'
 // import { useEffect } from 'react'
 
-const Dispositivos = () => {
+const DispositivosPage = () => {
   const getData = async () => {
     const { data } = await fetchClient().get(
       'http://localhost:8080/dispositivo',
@@ -69,4 +69,4 @@ const Dispositivos = () => {
   )
 }
 
-export default Dispositivos
+export default DispositivosPage
