@@ -11,8 +11,6 @@ import ThemeSwitcher from '@/components/ui/theme-switcher'
 import { dispositivoColumns } from '@/domain/dispositivo/dispositivo-columns'
 import { useQuery } from '@tanstack/react-query'
 import fetchClient from '@/services/fetch-client'
-// import { useQuery } from '@tanstack/react-query'
-// import { useEffect } from 'react'
 
 const DispositivosPage = () => {
   const getData = async () => {
