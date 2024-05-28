@@ -22,7 +22,7 @@ const Dispositivos = () => {
 
   return (
     <>
-      <div className="bg-neutral-50 p-4 h-screen">
+      <div className="bg-neutral-50 p-4 h-full">
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
