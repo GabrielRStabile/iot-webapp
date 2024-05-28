@@ -10,19 +10,12 @@ import {
 import ThemeSwitcher from '@/components/ui/theme-switcher'
 import { dispositivoColumns } from '@/domain/dispositivo/dispositivo-columns'
 import { useQuery } from '@tanstack/react-query'
-import fetchClient from '@/services/fetch-client'
+import { getDispositivos } from '@/domain/dispositivo/dispositivo-queries'
 
 const DispositivosPage = () => {
-  const getData = async () => {
-    const { data } = await fetchClient().get(
-      'http://localhost:8080/dispositivo',
-    )
-    return data
-  }
-
   const { data } = useQuery({
     queryKey: ['dispositivos'],
-    queryFn: getData,
+    queryFn: getDispositivos,
   })
 
   return (
