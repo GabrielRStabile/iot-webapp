@@ -5,8 +5,8 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Button } from '@/components/ui/button'
 import { Edit, Eye } from 'lucide-react'
 import ConfirmDeleteDialog from '@/components/confirm-delete-dialog'
-import fetchClient from '@/services/fetch-client'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { deleteDispositivo } from './dispositivo-queries'
 
 export const dispositivoColumns: ColumnDef<Dispositivo>[] = [
   {
@@ -67,14 +67,8 @@ export const dispositivoColumns: ColumnDef<Dispositivo>[] = [
 
       const queryClient = useQueryClient()
 
-      const handleDelete = async (dispositivoId: number) => {
-        await fetchClient().delete(
-          `http://localhost:8080/dispositivo/${dispositivoId}`,
-        )
-      }
-
       const { mutateAsync: deleteDispositivoFn } = useMutation({
-        mutationFn: handleDelete,
+        mutationFn: deleteDispositivo,
         onSuccess(_, dispositivoId) {
           queryClient.setQueryData(
             ['dispositivos'],

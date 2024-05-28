@@ -5,4 +5,10 @@ const getDispositivos = async () => {
   return data
 }
 
-export { getDispositivos }
+const deleteDispositivo = async (dispositivoId: number) => {
+  await fetchClient().delete(
+    `http://localhost:8080/dispositivo/${dispositivoId}`,
+  )
+}
+
+export { getDispositivos, deleteDispositivo }
