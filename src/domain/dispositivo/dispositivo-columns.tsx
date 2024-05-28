@@ -5,7 +5,8 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Button } from '@/components/ui/button'
 import { Edit, Eye } from 'lucide-react'
 import ConfirmDeleteDialog from '@/components/confirm-delete-dialog'
-import useFetch from '@/hooks/useFetch'
+import fetchClient from '@/services/fetch-client'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 export const dispositivoColumns: ColumnDef<Dispositivo>[] = [
   {
@@ -63,18 +64,42 @@ export const dispositivoColumns: ColumnDef<Dispositivo>[] = [
     header: 'Ações',
     cell: function CellComponent({ row }) {
       const dispositivoId = row.original.id
-      const { error, request } = useFetch()
 
-      const handleDelete = () => {
-        request(`http://localhost:8080/dispositivo/${dispositivoId}`, {
-          method: 'DELETE',
-        })
-        if (error) console.log(error)
+      const queryClient = useQueryClient()
+
+      const handleDelete = async (dispositivoId: number) => {
+        await fetchClient().delete(
+          `http://localhost:8080/dispositivo/${dispositivoId}`,
+        )
+      }
+
+      const { mutateAsync: deleteDispositivoFn } = useMutation({
+        mutationFn: handleDelete,
+        onSuccess(_, dispositivoId) {
+          queryClient.setQueryData(
+            ['dispositivos'],
+            (oldData: Dispositivo[] | undefined) => {
+              if (!oldData) return []
+              return oldData.filter(
+                (dispositivo) => dispositivo.id !== dispositivoId,
+              )
+            },
+          )
+        },
+      })
+
+      async function handleDeleteDispositivo() {
+        try {
+          await deleteDispositivoFn(dispositivoId)
+          alert('Dispositivo removido com sucesso!')
+        } catch (err) {
+          alert('Erro ao remover dispositivo')
+        }
       }
 
       return (
         <div className="flex gap-[0.625rem]">
-          <ConfirmDeleteDialog onConfirm={handleDelete} />
+          <ConfirmDeleteDialog onConfirm={handleDeleteDispositivo} />
           <Button variant="outline" className="py-2 px-3">
             <Eye size="16" />
           </Button>

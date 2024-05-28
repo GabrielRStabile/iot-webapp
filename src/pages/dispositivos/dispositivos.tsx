@@ -9,16 +9,23 @@ import {
 
 import ThemeSwitcher from '@/components/ui/theme-switcher'
 import { dispositivoColumns } from '@/domain/dispositivo/dispositivo-columns'
-import Dispositivo from '@/domain/dispositivo/dispositivo-interface'
-import useFetch from '@/hooks/useFetch'
-import { useEffect } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import fetchClient from '@/services/fetch-client'
+// import { useQuery } from '@tanstack/react-query'
+// import { useEffect } from 'react'
 
 const Dispositivos = () => {
-  const { data, request } = useFetch<Dispositivo[]>()
+  const getData = async () => {
+    const { data } = await fetchClient().get(
+      'http://localhost:8080/dispositivo',
+    )
+    return data
+  }
 
-  useEffect(() => {
-    request('http://localhost:8080/dispositivo')
-  }, [request])
+  const { data } = useQuery({
+    queryKey: ['dispositivos'],
+    queryFn: getData,
+  })
 
   return (
     <>

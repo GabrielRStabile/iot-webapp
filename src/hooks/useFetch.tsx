@@ -62,4 +62,5 @@ const useFetch = <T = unknown,>(): UseFetch<T> => {
   return { data, error, loading, request }
 }
 
-export default useFetch
+export { useFetch }
+export type { FetchResponse }
