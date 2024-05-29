@@ -14,8 +14,21 @@ import {
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { GoogleMaps } from '@/components/map'
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { useState } from 'react'
 
 const DispositivoCreatePage = () => {
+  const [position, setPosition] = useState<
+    google.maps.LatLngLiteral | undefined
+  >()
+
   const createDispositivoSchema = z.object({
     nome: z.string().min(2),
     descricao: z.string().min(1),
@@ -112,12 +125,24 @@ const DispositivoCreatePage = () => {
               />
               <FormField
                 control={form.control}
-                name="local"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Localização</FormLabel>
+                name="gatewayId"
+                render={() => (
+                  <FormItem className="flex items-center">
+                    <FormLabel>Gateway Associado</FormLabel>
                     <FormControl>
-                      <Input type="text" {...field} />
+                      <Select>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Nenhum" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            <SelectItem value="1">Gateway Casa</SelectItem>
+                            <SelectItem value="2">
+                              Gateway Lorem ipsum
+                            </SelectItem>
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -125,18 +150,24 @@ const DispositivoCreatePage = () => {
               />
               <FormField
                 control={form.control}
-                name="gatewayId"
+                name="local"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Gateway Associado</FormLabel>
+                    <FormLabel>Localização</FormLabel>
                     <FormControl>
-                      <Input type="text" {...field} />
+                      <Input
+                        type="text"
+                        {...field}
+                        value={
+                          position ? `${position.lat}, ${position.lng}` : ''
+                        }
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <GoogleMaps />
+              <GoogleMaps position={position} setPosition={setPosition} />
             </form>
           </Form>
         </div>

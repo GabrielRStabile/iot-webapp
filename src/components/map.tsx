@@ -1,10 +1,20 @@
-import { APIProvider, Map, Marker } from '@vis.gl/react-google-maps'
-import { useEffect, useState } from 'react'
+import {
+  APIProvider,
+  Map,
+  MapMouseEvent,
+  Marker,
+} from '@vis.gl/react-google-maps'
+import React, { useCallback, useEffect } from 'react'
 
-export const GoogleMaps = () => {
-  const [position, setPosition] = useState<
-    google.maps.LatLngLiteral | undefined
-  >()
+interface MapProps {
+  position: google.maps.LatLngLiteral | undefined
+  setPosition: (position: google.maps.LatLngLiteral) => void
+}
+
+export const GoogleMaps: React.FC<MapProps> = ({ position, setPosition }) => {
+  // const [position, setPosition] = useState<
+  //   google.maps.LatLngLiteral | undefined
+  // >()
 
   useEffect(() => {
     if ('geolocation' in navigator) {
@@ -16,6 +26,17 @@ export const GoogleMaps = () => {
       })
     }
   }, [])
+
+  const onMapClick = useCallback(
+    (event: MapMouseEvent) => {
+      if (event.detail.latLng) {
+        const { lat, lng } = event.detail.latLng
+        setPosition({ lat, lng })
+      }
+    },
+    [setPosition],
+  )
+
   return (
     <APIProvider apiKey={import.meta.env.VITE_MAPS_API_KEY}>
       <Map
@@ -23,6 +44,7 @@ export const GoogleMaps = () => {
         defaultZoom={18}
         streetViewControl={false}
         className="w-full h-96 overflow-hidden rounded-md"
+        onClick={onMapClick}
       >
         <Marker position={position} />
       </Map>
