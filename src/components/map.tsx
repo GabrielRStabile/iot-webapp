@@ -12,10 +12,6 @@ interface MapProps {
 }
 
 export const GoogleMaps: React.FC<MapProps> = ({ position, setPosition }) => {
-  // const [position, setPosition] = useState<
-  //   google.maps.LatLngLiteral | undefined
-  // >()
-
   useEffect(() => {
     if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition((position) => {
