@@ -32,6 +32,8 @@ import {
 import { createDispositivo } from '@/domain/dispositivo/dispositivo-queries'
 import { CreateDispositivo } from '@/domain/dispositivo/create-dispositivo-dto'
 import { useNavigate } from 'react-router-dom'
+import Dispositivo from '@/domain/dispositivo/dispositivo-interface'
+import { GetGateway } from '@/domain/gateway/get-gateway-dto'
 
 const DispositivoCreatePage = () => {
   const [position, setPosition] = useState<
@@ -43,17 +45,13 @@ const DispositivoCreatePage = () => {
 
   const { mutateAsync: createDispositivoFn } = useMutation({
     mutationFn: createDispositivo,
-    onSuccess(_, variables) {
-      queryClient.setQueryData(['dispositivos'], (data) => {
-        return [
-          ...data,
-          {
-            nome: variables.nome,
-            descricao: variables.descricao,
-            endereco: variables.endereco,
-            local: variables.local,
-          },
-        ]
+    onSuccess(newDispositivo) {
+      queryClient.setQueryData<Dispositivo[]>(['dispositivos'], (data) => {
+        if (data) {
+          return [...data, newDispositivo]
+        } else {
+          return [newDispositivo]
+        }
       })
     },
   })
@@ -61,17 +59,20 @@ const DispositivoCreatePage = () => {
   const { mutateAsync: associateDispositivoWithGatewayFn } = useMutation({
     mutationFn: associateDispositivoWithGateway,
     onSuccess(_, variables) {
-      queryClient.setQueryData(['dispositivos'], (dispositivos) => {
-        return dispositivos.map((dispositivo) =>
-          dispositivo.id === variables.dispositivosId[0]
-            ? { ...dispositivo, gatewayId: variables.gatewayId }
-            : dispositivo,
-        )
-      })
+      queryClient.setQueryData<Dispositivo[]>(
+        ['dispositivos'],
+        (dispositivos) => {
+          return dispositivos?.map((dispositivo) =>
+            dispositivo.id === variables.dispositivosId[0]
+              ? { ...dispositivo, gatewayId: variables.gatewayId }
+              : dispositivo,
+          )
+        },
+      )
     },
   })
 
-  const { data: gateways } = useQuery({
+  const { data: gateways } = useQuery<GetGateway[]>({
     queryKey: ['gateways'],
     queryFn: getGateways,
   })
@@ -94,7 +95,6 @@ const DispositivoCreatePage = () => {
       endereco: '',
     },
   })
-
   const { setValue } = form
 
   useEffect(() => {

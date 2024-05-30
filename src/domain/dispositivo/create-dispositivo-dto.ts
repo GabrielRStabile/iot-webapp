@@ -3,6 +3,7 @@ interface CreateDispositivo {
   descricao: string
   endereco: string
   local: string
+  gatewayId?: number
 }
 
 export type { CreateDispositivo }
