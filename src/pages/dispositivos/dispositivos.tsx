@@ -15,7 +15,7 @@ import { Outlet, useLocation } from 'react-router-dom'
 import DispositivoCreatePage from './dispositivo-create'
 
 const DispositivosPage = () => {
-  const { data } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ['dispositivos'],
     queryFn: getDispositivos,
   })
@@ -26,13 +26,11 @@ const DispositivosPage = () => {
     return <DispositivoCreatePage />
   }
 
+  if (isLoading) return <p>carregando...</p>
   return (
     <>
       <div className="bg-neutral-50 p-4 h-full">
         <Outlet />
-        {location.pathname === '/dispositivos/new' ? (
-          <DispositivoCreatePage />
-        ) : null}
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>

@@ -22,18 +22,65 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import {
+  associateDispositivoWithGateway,
+  getGateways,
+} from '@/domain/gateway/gateway-queries'
+import { createDispositivo } from '@/domain/dispositivo/dispositivo-queries'
+import { CreateDispositivo } from '@/domain/dispositivo/create-dispositivo-dto'
+import { useNavigate } from 'react-router-dom'
 
 const DispositivoCreatePage = () => {
   const [position, setPosition] = useState<
     google.maps.LatLngLiteral | undefined
   >()
 
+  const queryClient = useQueryClient()
+  const navigate = useNavigate()
+
+  const { mutateAsync: createDispositivoFn } = useMutation({
+    mutationFn: createDispositivo,
+    onSuccess(_, variables) {
+      queryClient.setQueryData(['dispositivos'], (data) => {
+        return [
+          ...data,
+          {
+            nome: variables.nome,
+            descricao: variables.descricao,
+            endereco: variables.endereco,
+            local: variables.local,
+          },
+        ]
+      })
+    },
+  })
+
+  const { mutateAsync: associateDispositivoWithGatewayFn } = useMutation({
+    mutationFn: associateDispositivoWithGateway,
+    onSuccess(_, variables) {
+      queryClient.setQueryData(['dispositivos'], (dispositivos) => {
+        return dispositivos.map((dispositivo) =>
+          dispositivo.id === variables.dispositivosId[0]
+            ? { ...dispositivo, gatewayId: variables.gatewayId }
+            : dispositivo,
+        )
+      })
+    },
+  })
+
+  const { data: gateways } = useQuery({
+    queryKey: ['gateways'],
+    queryFn: getGateways,
+  })
+
   const createDispositivoSchema = z.object({
     nome: z.string().min(2),
     descricao: z.string().min(1),
     local: z.string().min(1),
-    gatewayId: z.number(),
+    gatewayId: z.string().optional(),
     endereco: z.string().ip(),
   })
 
@@ -48,34 +95,67 @@ const DispositivoCreatePage = () => {
     },
   })
 
-  function onSubmit(values: z.infer<typeof createDispositivoSchema>) {
-    console.log(values)
+  const { setValue } = form
+
+  useEffect(() => {
+    if (position) {
+      setValue('local', `${position.lat}, ${position.lng}`)
+    }
+  }, [position, setValue])
+
+  async function onSubmit(values: z.infer<typeof createDispositivoSchema>) {
+    try {
+      const { nome, descricao, endereco, local, gatewayId } = values
+      const dispositivo: CreateDispositivo = {
+        nome,
+        descricao,
+        endereco,
+        local,
+      }
+
+      const newDispositivo = await createDispositivoFn(dispositivo)
+
+      if (gatewayId) {
+        await associateDispositivoWithGatewayFn({
+          gatewayId: Number(gatewayId),
+          dispositivosId: [Number(newDispositivo.id)],
+        })
+      }
+
+      alert('dispositivo criado com sucesso')
+      navigate('/dispositivos')
+    } catch (err) {
+      alert('erro ao criar dispositivo')
+    }
   }
 
   return (
     <div className="bg-neutral-50 p-4 h-full">
-      <div className="flex justify-between items-center mb-3">
-        <h4 className="scroll-m-20 text-xl font-semibold tracking-tight">
-          Adicionar novo Dispositivo
-        </h4>
-        <div className="flex items-center gap-[0.625rem]">
-          <Button variant="outline">Voltar</Button>
-          <Button className="capitalize">
-            <CirclePlus className="mr-2" size="16" />
-            Adicionar Dispositivo
-          </Button>
-        </div>
-      </div>
-      <main className="grid grid-cols-2 gap-[0.625rem]">
-        <div className="row-span-2 border border-neutral-200 rounded-md bg-white h-full p-6">
-          <h5 className="text-lg font-semibold mb-[0.625rem]">
-            Informações básicas
-          </h5>
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="flex flex-col gap-[0.625rem]"
-            >
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)}>
+          <div className="flex justify-between items-center mb-3">
+            <h4 className="scroll-m-20 text-xl font-semibold tracking-tight">
+              Adicionar novo Dispositivo
+            </h4>
+            <div className="flex items-center gap-[0.625rem]">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => navigate('/dispositivos')}
+              >
+                Voltar
+              </Button>
+              <Button type="submit" className="capitalize">
+                <CirclePlus className="mr-2" size="16" />
+                Adicionar Dispositivo
+              </Button>
+            </div>
+          </div>
+          <main className="grid grid-cols-2 gap-[0.625rem]">
+            <div className="row-span-2 border border-neutral-200 rounded-md bg-white h-full p-6">
+              <h5 className="text-lg font-semibold mb-[0.625rem]">
+                Informações básicas
+              </h5>
               <FormField
                 control={form.control}
                 name="nome"
@@ -126,20 +206,28 @@ const DispositivoCreatePage = () => {
               <FormField
                 control={form.control}
                 name="gatewayId"
-                render={() => (
+                render={({ field }) => (
                   <FormItem className="flex items-center">
                     <FormLabel>Gateway Associado</FormLabel>
                     <FormControl>
-                      <Select>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="Nenhum" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectGroup>
-                            <SelectItem value="1">Gateway Casa</SelectItem>
-                            <SelectItem value="2">
-                              Gateway Lorem ipsum
-                            </SelectItem>
+                            {gateways &&
+                              gateways.map((gateway) => (
+                                <SelectItem
+                                  key={gateway.id}
+                                  value={`${gateway.id}`}
+                                >
+                                  {gateway.nome}
+                                </SelectItem>
+                              ))}
                           </SelectGroup>
                         </SelectContent>
                       </Select>
@@ -155,29 +243,36 @@ const DispositivoCreatePage = () => {
                   <FormItem>
                     <FormLabel>Localização</FormLabel>
                     <FormControl>
-                      <Input
-                        type="text"
-                        {...field}
-                        value={
-                          position ? `${position.lat}, ${position.lng}` : ''
-                        }
-                      />
+                      <Input type="text" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <GoogleMaps position={position} setPosition={setPosition} />
-            </form>
-          </Form>
-        </div>
-        <div className="border border-neutral-200 rounded-md bg-white h-full p-6">
-          aaa
-        </div>
-        <div className="border border-neutral-200 rounded-md bg-white h-full p-6">
-          aaa
-        </div>
-      </main>
+              <div className="mt-[0.625rem]">
+                <GoogleMaps position={position} setPosition={setPosition} />
+              </div>
+            </div>
+            <div className="border border-neutral-200 rounded-md bg-white h-full p-6">
+              <Tabs>
+                <TabsList defaultValue="associated">
+                  <TabsTrigger value="associated">
+                    Associados ao Dispositvo
+                  </TabsTrigger>
+                  <TabsTrigger value="available">
+                    Disponíveis para Associar
+                  </TabsTrigger>
+                </TabsList>
+                <TabsContent value="associated">oi</TabsContent>
+                <TabsContent value="available">tchau</TabsContent>
+              </Tabs>
+            </div>
+            <div className="border border-neutral-200 rounded-md bg-white h-full p-6">
+              aaa
+            </div>
+          </main>
+        </form>
+      </Form>
     </div>
   )
 }

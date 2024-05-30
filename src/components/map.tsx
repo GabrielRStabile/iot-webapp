@@ -25,7 +25,7 @@ export const GoogleMaps: React.FC<MapProps> = ({ position, setPosition }) => {
         })
       })
     }
-  }, [])
+  }, [setPosition])
 
   const onMapClick = useCallback(
     (event: MapMouseEvent) => {

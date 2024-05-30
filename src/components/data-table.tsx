@@ -24,6 +24,7 @@ import {
 } from 'lucide-react'
 import { useState } from 'react'
 import { Search } from './ui/input'
+import { useNavigate } from 'react-router-dom'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -61,6 +62,8 @@ export function DataTable<TData, TValue>({
     atuador: 'atuadores',
   }
 
+  const navigate = useNavigate()
+
   return (
     <div>
       <div className="flex justify-between mb-[0.625rem]">
@@ -77,7 +80,7 @@ export function DataTable<TData, TValue>({
             <FileSpreadsheet className="mr-2" size="16" />
             Exportar
           </Button>
-          <Button className="capitalize">
+          <Button className="capitalize" onClick={() => navigate('./new')}>
             <CirclePlus className="mr-2" size="16" />
             Adicionar {dataType}
           </Button>
