@@ -97,12 +97,6 @@ const DispositivoCreatePage = () => {
   })
   const { setValue } = form
 
-  useEffect(() => {
-    if (position) {
-      setValue('local', `${position.lat}, ${position.lng}`)
-    }
-  }, [position, setValue])
-
   async function onSubmit(values: z.infer<typeof createDispositivoSchema>) {
     try {
       const { nome, descricao, endereco, local, gatewayId } = values
@@ -128,6 +122,12 @@ const DispositivoCreatePage = () => {
       alert('erro ao criar dispositivo')
     }
   }
+
+  useEffect(() => {
+    if (position) {
+      setValue('local', `${position.lat}, ${position.lng}`)
+    }
+  }, [position, setValue])
 
   return (
     <div className="bg-neutral-50 p-4 h-full">
