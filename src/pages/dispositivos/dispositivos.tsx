@@ -1,3 +1,4 @@
+import { DataTable } from '@/components/data-table'
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -7,11 +8,29 @@ import {
 } from '@/components/ui/breadcrumb'
 
 import ThemeSwitcher from '@/components/ui/theme-switcher'
+import { dispositivoColumns } from '@/domain/dispositivo/dispositivo-columns'
+import { useQuery } from '@tanstack/react-query'
+import { getDispositivos } from '@/domain/dispositivo/dispositivo-queries'
+import { Outlet, useLocation } from 'react-router-dom'
+import DispositivoCreatePage from './dispositivo-create'
 
-const Dispositivos = () => {
+const DispositivosPage = () => {
+  const { data, isLoading } = useQuery({
+    queryKey: ['dispositivos'],
+    queryFn: getDispositivos,
+  })
+
+  const location = useLocation()
+
+  if (location.pathname === '/dispositivos/new') {
+    return <DispositivoCreatePage />
+  }
+
+  if (isLoading) return <p>carregando...</p>
   return (
     <>
-      <div className="bg-neutral-50 p-4 h-screen">
+      <div className="bg-neutral-50 p-4 h-full">
+        <Outlet />
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
@@ -37,18 +56,18 @@ const Dispositivos = () => {
               Gerencie e adicione mais dispositivos em seus gateways.
             </span>
           </div>
-          {/* 
+
           {data && (
             <DataTable
               columns={dispositivoColumns}
               data={data}
               dataType="dispositivo"
             />
-          )} */}
+          )}
         </main>
       </div>
     </>
   )
 }
 
-export default Dispositivos
+export default DispositivosPage

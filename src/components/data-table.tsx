@@ -24,6 +24,7 @@ import {
 } from 'lucide-react'
 import { useState } from 'react'
 import { Search } from './ui/input'
+import { useNavigate } from 'react-router-dom'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -38,6 +39,8 @@ export function DataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 
+  const [rowSelection, setRowSelection] = useState({})
+
   const table = useReactTable({
     data,
     columns,
@@ -45,8 +48,10 @@ export function DataTable<TData, TValue>({
     getPaginationRowModel: getPaginationRowModel(),
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
+    onRowSelectionChange: setRowSelection,
     state: {
       columnFilters,
+      rowSelection,
     },
   })
 
@@ -56,6 +61,8 @@ export function DataTable<TData, TValue>({
     sensor: 'sensores',
     atuador: 'atuadores',
   }
+
+  const navigate = useNavigate()
 
   return (
     <div>
@@ -73,7 +80,7 @@ export function DataTable<TData, TValue>({
             <FileSpreadsheet className="mr-2" size="16" />
             Exportar
           </Button>
-          <Button className="capitalize">
+          <Button className="capitalize" onClick={() => navigate('./new')}>
             <CirclePlus className="mr-2" size="16" />
             Adicionar {dataType}
           </Button>
