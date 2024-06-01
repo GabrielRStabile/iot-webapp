@@ -36,15 +36,15 @@ const router = createBrowserRouter([
         path: '',
         element: <App />,
       },
-    ],
-  },
-  {
-    path: '/dispositivos',
-    element: <DispositivosPage />,
-    children: [
       {
-        path: 'new',
-        element: <DispositivoCreatePage />,
+        path: 'dispositivos',
+        element: <DispositivosPage />,
+        children: [
+          {
+            path: 'new',
+            element: <DispositivoCreatePage />,
+          },
+        ],
       },
     ],
   },
