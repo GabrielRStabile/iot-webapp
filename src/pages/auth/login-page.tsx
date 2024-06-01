@@ -17,7 +17,7 @@ import AuthHeader from './components/auth-header'
 import AuthMain from './components/auth-main'
 
 export default function LoginPage() {
-  const { login, user } = useAuth()
+  const { login } = useAuth()
   const navigate = useNavigate()
 
   const formSchema = z.object({
@@ -30,12 +30,12 @@ export default function LoginPage() {
   })
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    await login({
+    const logged = await login({
       email: values.email,
       password: values.password,
     })
 
-    if (user) {
+    if (logged) {
       navigate('/dashboard', { replace: true })
     }
   }
