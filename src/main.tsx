@@ -10,6 +10,10 @@ import './index.css'
 import App from './pages/app'
 import LoginPage from './pages/auth/login-page'
 import SignUpPage from './pages/auth/signup-page'
+import { QueryClientProvider } from '@tanstack/react-query'
+import { queryClient } from './lib/react-query'
+import DispositivosPage from './pages/dispositivos/dispositivos'
+import DispositivoCreatePage from './pages/dispositivos/dispositivo-create'
 
 const router = createBrowserRouter([
   {
@@ -34,17 +38,29 @@ const router = createBrowserRouter([
       },
     ],
   },
+  {
+    path: '/dispositivos',
+    element: <DispositivosPage />,
+    children: [
+      {
+        path: 'new',
+        element: <DispositivoCreatePage />,
+      },
+    ],
+  },
 ])
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      <TooltipProvider>
-        <AuthProvider>
-          <RouterProvider router={router} />
-          <Toaster />
-        </AuthProvider>
-      </TooltipProvider>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <AuthProvider>
+            <RouterProvider router={router} />
+            <Toaster />
+          </AuthProvider>
+        </TooltipProvider>
+      </QueryClientProvider>
     </ThemeProvider>
   </React.StrictMode>,
 )
