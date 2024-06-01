@@ -1,3 +1,4 @@
+import { QueryClientProvider } from '@tanstack/react-query'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
@@ -7,13 +8,12 @@ import { Toaster } from './components/ui/sonner'
 import { TooltipProvider } from './components/ui/tooltip'
 import { AuthProvider } from './contexts/auth-context'
 import './index.css'
+import { queryClient } from './lib/react-query'
 import App from './pages/app'
 import LoginPage from './pages/auth/login-page'
 import SignUpPage from './pages/auth/signup-page'
-import { QueryClientProvider } from '@tanstack/react-query'
-import { queryClient } from './lib/react-query'
-import DispositivosPage from './pages/dispositivos/dispositivos'
 import DispositivoCreatePage from './pages/dispositivos/dispositivo-create'
+import DispositivosPage from './pages/dispositivos/dispositivos'
 
 const router = createBrowserRouter([
   {
@@ -36,15 +36,15 @@ const router = createBrowserRouter([
         path: '',
         element: <App />,
       },
-    ],
-  },
-  {
-    path: '/dispositivos',
-    element: <DispositivosPage />,
-    children: [
       {
-        path: 'new',
-        element: <DispositivoCreatePage />,
+        path: 'dispositivos',
+        element: <DispositivosPage />,
+        children: [
+          {
+            path: 'new',
+            element: <DispositivoCreatePage />,
+          },
+        ],
       },
     ],
   },
