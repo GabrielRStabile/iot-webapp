@@ -94,10 +94,10 @@ export const dispositivoColumns: ColumnDef<Dispositivo>[] = [
       return (
         <div className="flex gap-[0.625rem]">
           <ConfirmDeleteDialog onConfirm={handleDeleteDispositivo} />
-          <Button variant="outline" className="py-2 px-3">
+          <Button type="button" variant="outline" className="py-2 px-3">
             <Eye size="16" />
           </Button>
-          <Button variant="outline" className="py-2 px-3">
+          <Button type="button" variant="outline" className="py-2 px-3">
             <Edit size="16" />
           </Button>
         </div>

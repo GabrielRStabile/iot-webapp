@@ -34,6 +34,10 @@ import { CreateDispositivo } from '@/domain/dispositivo/create-dispositivo-dto'
 import { useNavigate } from 'react-router-dom'
 import Dispositivo from '@/domain/dispositivo/dispositivo-interface'
 import { GetGateway } from '@/domain/gateway/get-gateway-dto'
+import { GetSensor } from '@/domain/sensor/get-sensor-dto'
+import { getSensores } from '@/domain/sensor/sensor-queries'
+import { sensorColumns } from '@/domain/sensor/sensor-columns'
+import { DataTableBasic } from '@/components/data-table-basic'
 
 const DispositivoCreatePage = () => {
   const [position, setPosition] = useState<
@@ -76,6 +80,14 @@ const DispositivoCreatePage = () => {
     queryKey: ['gateways'],
     queryFn: getGateways,
   })
+
+  const { data: sensores } = useQuery<GetSensor[]>({
+    queryKey: ['sensores'],
+    queryFn: getSensores,
+  })
+
+  const [availableSensores, setAvailableSensores] = useState<GetSensor[]>([])
+  const [associatedSensores, setAssociatedSensores] = useState<GetSensor[]>([])
 
   const createDispositivoSchema = z.object({
     nome: z.string().min(2),
@@ -124,10 +136,15 @@ const DispositivoCreatePage = () => {
   }
 
   useEffect(() => {
+    setAssociatedSensores([])
     if (position) {
       setValue('local', `${position.lat}, ${position.lng}`)
     }
-  }, [position, setValue])
+    if (sensores) {
+      const disponiveis = sensores.filter((sensor) => !sensor.dispositivoId)
+      setAvailableSensores(disponiveis)
+    }
+  }, [position, setValue, sensores])
 
   return (
     <div className="bg-neutral-50 p-4 h-full">
@@ -254,17 +271,31 @@ const DispositivoCreatePage = () => {
               </div>
             </div>
             <div className="border border-neutral-200 rounded-md bg-white h-full p-6">
-              <Tabs>
-                <TabsList defaultValue="associated">
+              <Tabs defaultValue="available">
+                <TabsList>
                   <TabsTrigger value="associated">
-                    Associados ao Dispositvo
+                    Associados ao Dispositivo
                   </TabsTrigger>
                   <TabsTrigger value="available">
                     Disponíveis para Associar
                   </TabsTrigger>
                 </TabsList>
-                <TabsContent value="associated">oi</TabsContent>
-                <TabsContent value="available">tchau</TabsContent>
+                <TabsContent value="associated">
+                  {
+                    <DataTableBasic
+                      data={associatedSensores}
+                      columns={sensorColumns}
+                    />
+                  }
+                </TabsContent>
+                <TabsContent value="available">
+                  {
+                    <DataTableBasic
+                      data={availableSensores}
+                      columns={sensorColumns}
+                    />
+                  }
+                </TabsContent>
               </Tabs>
             </div>
             <div className="border border-neutral-200 rounded-md bg-white h-full p-6">
