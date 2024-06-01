@@ -81,9 +81,9 @@ function UserControls() {
 
 function MainContent() {
   return (
-    <div>
+    <div className="pl-16">
       <Header />
-      <main className="p-4 sm:px-6 sm:py-0">
+      <main className="sm:py-0">
         <Outlet />
       </main>
     </div>

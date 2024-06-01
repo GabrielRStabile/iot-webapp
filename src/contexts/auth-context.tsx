@@ -9,7 +9,7 @@ import fetchClient from '../services/fetch-client'
 interface AuthContextData {
   signed: boolean
   user: UserEntity | null
-  login(user: LoginRequestDTO): Promise<void>
+  login(user: LoginRequestDTO): Promise<boolean>
   register(user: RegisterRequestDTO): Promise<boolean>
   logout(): void
 }
@@ -38,7 +38,7 @@ export const AuthProvider = ({ children }: AuthContextProviderProps) => {
     }
   }, [])
 
-  async function login(userData: LoginRequestDTO) {
+  async function login(userData: LoginRequestDTO): Promise<boolean> {
     try {
       const response = await fetch(`${import.meta.env.VITE_IOT_API}/auth`, {
         method: 'POST',
@@ -69,6 +69,8 @@ export const AuthProvider = ({ children }: AuthContextProviderProps) => {
               }),
             )
           })
+
+        return true
       } else {
         const errorData = await response.json()
         if (Array.isArray(errorData.errors)) {
@@ -77,9 +79,12 @@ export const AuthProvider = ({ children }: AuthContextProviderProps) => {
         } else {
           toast.error(`${errorData}`)
         }
+
+        return false
       }
     } catch (error) {
       toast.error(`${error}`)
+      return false
     }
   }
 
