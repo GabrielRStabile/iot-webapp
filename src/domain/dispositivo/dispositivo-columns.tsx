@@ -7,6 +7,8 @@ import { Edit, Eye } from 'lucide-react'
 import ConfirmDeleteDialog from '@/components/confirm-delete-dialog'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { deleteDispositivo } from './dispositivo-queries'
+import { useNavigate } from 'react-router-dom'
+import { toast } from 'sonner'
 
 export const dispositivoColumns: ColumnDef<Dispositivo>[] = [
   {
@@ -66,6 +68,7 @@ export const dispositivoColumns: ColumnDef<Dispositivo>[] = [
       const dispositivoId = row.original.id
 
       const queryClient = useQueryClient()
+      const navigate = useNavigate()
 
       const { mutateAsync: deleteDispositivoFn } = useMutation({
         mutationFn: deleteDispositivo,
@@ -85,19 +88,29 @@ export const dispositivoColumns: ColumnDef<Dispositivo>[] = [
       async function handleDeleteDispositivo() {
         try {
           await deleteDispositivoFn(dispositivoId)
-          alert('Dispositivo removido com sucesso!')
+          toast.success(`${row.original.nome} removido com sucesso!`)
         } catch (err) {
-          alert('Erro ao remover dispositivo')
+          toast.error('Ops! Erro ao remover o dispositivo.')
         }
       }
 
       return (
         <div className="flex gap-[0.625rem]">
           <ConfirmDeleteDialog onConfirm={handleDeleteDispositivo} />
-          <Button type="button" variant="outline" className="py-2 px-3">
+          <Button
+            onClick={() => navigate(`./${dispositivoId}/details`)}
+            type="button"
+            variant="outline"
+            className="py-2 px-3"
+          >
             <Eye size="16" />
           </Button>
-          <Button type="button" variant="outline" className="py-2 px-3">
+          <Button
+            onClick={() => navigate(`./${dispositivoId}/edit`)}
+            type="button"
+            variant="outline"
+            className="py-2 px-3"
+          >
             <Edit size="16" />
           </Button>
         </div>

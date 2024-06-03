@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button'
-import { CirclePlus } from 'lucide-react'
+import { Save } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -29,8 +29,10 @@ import {
   associateDispositivoWithGateway,
   getGateways,
 } from '@/domain/gateway/gateway-queries'
-import { createDispositivo } from '@/domain/dispositivo/dispositivo-queries'
-import { CreateDispositivo } from '@/domain/dispositivo/create-dispositivo-dto'
+import {
+  getDispositivoById,
+  updateDispositivo,
+} from '@/domain/dispositivo/dispositivo-queries'
 import { Link, useNavigate } from 'react-router-dom'
 import Dispositivo from '@/domain/dispositivo/dispositivo-interface'
 import { GetGateway } from '@/domain/gateway/get-gateway-dto'
@@ -48,9 +50,10 @@ import {
   BreadcrumbList,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb'
+import { UpdateDispositivo } from '@/domain/dispositivo/update-dispositivo-dto'
 import { toast } from 'sonner'
 
-const DispositivoCreatePage = () => {
+const DispositivoEditPage = ({ id }: { id: string }) => {
   const [position, setPosition] = useState<
     google.maps.LatLngLiteral | undefined
   >()
@@ -58,8 +61,8 @@ const DispositivoCreatePage = () => {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
 
-  const { mutateAsync: createDispositivoFn } = useMutation({
-    mutationFn: createDispositivo,
+  const { mutateAsync: updateDispositivoFn } = useMutation({
+    mutationFn: updateDispositivo,
     onSuccess(newDispositivo) {
       queryClient.setQueryData<Dispositivo[]>(['dispositivos'], (data) => {
         if (data) {
@@ -87,17 +90,22 @@ const DispositivoCreatePage = () => {
     },
   })
 
-  const { data: gateways } = useQuery<GetGateway[]>({
+  const { data: dispositivo, isLoading } = useQuery<Dispositivo>({
+    queryKey: ['dispositivoEdit', id],
+    queryFn: getDispositivoById,
+  })
+
+  const { data: gateways = [] } = useQuery<GetGateway[]>({
     queryKey: ['gateways'],
     queryFn: getGateways,
   })
 
-  const { data: sensores } = useQuery<GetSensor[]>({
+  const { data: sensores = [] } = useQuery<GetSensor[]>({
     queryKey: ['sensores'],
     queryFn: getSensores,
   })
 
-  const { data: atuadores } = useQuery<GetAtuador[]>({
+  const { data: atuadores = [] } = useQuery<GetAtuador[]>({
     queryKey: ['atuadores'],
     queryFn: getAtuadores,
   })
@@ -106,6 +114,7 @@ const DispositivoCreatePage = () => {
   const [associatedSensores, setAssociatedSensores] = useState<GetSensor[]>([])
 
   const [availableAtuadores, setAvailableAtuadores] = useState<GetAtuador[]>([])
+
   const createDispositivoSchema = z.object({
     nome: z.string().min(2),
     descricao: z.string().min(1),
@@ -129,26 +138,29 @@ const DispositivoCreatePage = () => {
   async function onSubmit(values: z.infer<typeof createDispositivoSchema>) {
     try {
       const { nome, descricao, endereco, local, gatewayId } = values
-      const dispositivo: CreateDispositivo = {
-        nome,
-        descricao,
-        endereco,
-        local,
+      const newDispositivo: UpdateDispositivo = {
+        id: Number(id),
+        newData: {
+          nome,
+          descricao,
+          endereco,
+          local,
+        },
       }
 
-      const newDispositivo = await createDispositivoFn(dispositivo)
+      const updatedDispositivo = await updateDispositivoFn(newDispositivo)
 
       if (gatewayId) {
         await associateDispositivoWithGatewayFn({
           gatewayId: Number(gatewayId),
-          dispositivosId: [Number(newDispositivo.id)],
+          dispositivosId: [Number(updatedDispositivo.id)],
         })
       }
 
-      toast.success('Dispositivo criado com sucesso!')
+      toast.success('Dispositivo atualizado com sucesso!')
       navigate('/dashboard/dispositivos')
     } catch (err) {
-      toast.error('Ops! Um erro ocorreu ao criar o dispositivo.')
+      toast.error('Ops! Um erro ocorreu ao atualizar o dispositivo.')
     }
   }
 
@@ -165,7 +177,28 @@ const DispositivoCreatePage = () => {
       const disponiveis = atuadores.filter((atuador) => !atuador.dispositivoId)
       setAvailableAtuadores(disponiveis)
     }
-  }, [position, setValue, sensores, atuadores])
+  }, [position, setValue, sensores, atuadores, dispositivo])
+
+  useEffect(() => {
+    if (dispositivo) {
+      const [lat, lng] = dispositivo.local.split(', ').map(Number)
+      setPosition({ lat, lng })
+
+      const createDispositivo = {
+        nome: dispositivo.nome,
+        descricao: dispositivo.descricao,
+        endereco: dispositivo.endereco,
+        local: dispositivo.local,
+        gatewayId: dispositivo.gatewayId?.toString() ?? undefined,
+      }
+
+      form.reset(createDispositivo)
+    }
+  }, [form, dispositivo])
+
+  if (isLoading) {
+    return <div>carregando...</div>
+  }
 
   return (
     <div>
@@ -198,7 +231,7 @@ const DispositivoCreatePage = () => {
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="flex justify-between items-center mb-3">
             <h4 className="scroll-m-20 text-xl font-semibold tracking-tight">
-              Adicionar novo Dispositivo
+              {`Editando ${dispositivo?.nome}`}
             </h4>
             <div className="flex items-center gap-[0.625rem]">
               <Button
@@ -209,8 +242,8 @@ const DispositivoCreatePage = () => {
                 Voltar
               </Button>
               <Button type="submit" className="capitalize">
-                <CirclePlus className="mr-2" size="16" />
-                Adicionar Dispositivo
+                <Save className="mr-2" size="16" />
+                Salvar Alterações
               </Button>
             </div>
           </div>
@@ -275,7 +308,7 @@ const DispositivoCreatePage = () => {
                     <FormControl>
                       <Select
                         onValueChange={field.onChange}
-                        defaultValue={field.value}
+                        defaultValue={dispositivo?.gatewayId?.toString()}
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Nenhum" />
@@ -385,4 +418,4 @@ const DispositivoCreatePage = () => {
   )
 }
 
-export default DispositivoCreatePage
+export default DispositivoEditPage

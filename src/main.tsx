@@ -12,8 +12,8 @@ import { queryClient } from './lib/react-query'
 import App from './pages/app'
 import LoginPage from './pages/auth/login-page'
 import SignUpPage from './pages/auth/signup-page'
-import DispositivoCreatePage from './pages/dispositivos/dispositivo-create'
 import DispositivosPage from './pages/dispositivos/dispositivos'
+import { APIProvider } from '@vis.gl/react-google-maps'
 
 const router = createBrowserRouter([
   {
@@ -42,7 +42,12 @@ const router = createBrowserRouter([
         children: [
           {
             path: 'new',
-            element: <DispositivoCreatePage />,
+          },
+          {
+            path: ':dispositivoId/details',
+          },
+          {
+            path: ':dispositivoId/edit',
           },
         ],
       },
@@ -54,12 +59,14 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <AuthProvider>
-            <RouterProvider router={router} />
-            <Toaster />
-          </AuthProvider>
-        </TooltipProvider>
+        <APIProvider apiKey={import.meta.env.VITE_MAPS_API_KEY}>
+          <TooltipProvider>
+            <AuthProvider>
+              <RouterProvider router={router} />
+              <Toaster />
+            </AuthProvider>
+          </TooltipProvider>
+        </APIProvider>
       </QueryClientProvider>
     </ThemeProvider>
   </React.StrictMode>,
