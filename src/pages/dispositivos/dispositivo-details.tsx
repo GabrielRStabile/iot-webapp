@@ -20,6 +20,7 @@ import { sensorColumns } from '@/domain/sensor/sensor-columns'
 import { useQuery } from '@tanstack/react-query'
 import { Map, Marker } from '@vis.gl/react-google-maps'
 import { Link, useNavigate } from 'react-router-dom'
+import { Card, CardContent, CardTitle } from '../../components/ui/card'
 
 const DispositivoDetailsPage = ({ id }: { id: string }) => {
   const navigate = useNavigate()
@@ -67,10 +68,8 @@ const DispositivoDetailsPage = ({ id }: { id: string }) => {
         )
         return (
           <div key={key}>
-            <h6 className="text-sm font-medium text-neutral-900">
-              {displayName}
-            </h6>
-            <span className="text-sm text-neutral-600">{displayValue}</span>
+            <h6>{displayName}</h6>
+            <span>{displayValue}</span>
           </div>
         )
       })
@@ -83,9 +82,7 @@ const DispositivoDetailsPage = ({ id }: { id: string }) => {
 
       return (
         <div key="local">
-          <h6 className="text-sm font-medium text-neutral-900 mb-3">
-            {renameMap.local}
-          </h6>
+          <h6 className="mb-3">{renameMap.local}</h6>
           <div>
             <Map
               defaultCenter={{ lat, lng }}
@@ -136,9 +133,7 @@ const DispositivoDetailsPage = ({ id }: { id: string }) => {
       </Breadcrumb>
 
       <div className="flex justify-between items-center mb-3">
-        <h4 className="scroll-m-20 text-xl font-semibold tracking-tight ">
-          Detalhes de {dispositivo.nome}
-        </h4>
+        <h4>Detalhes de {dispositivo.nome}</h4>
         <Button
           variant="outline"
           onClick={() => navigate('/dashboard/dispositivos')}
@@ -147,27 +142,25 @@ const DispositivoDetailsPage = ({ id }: { id: string }) => {
         </Button>
       </div>
       <main className="grid grid-cols-2 gap-[0.625rem]">
-        <div className="row-span-2 border border-neutral-200 rounded-md bg-white h-full p-6">
-          <h5 className="text-lg font-semibold mb-[0.625rem]">
-            Informações básicas
-          </h5>
-          <div className="flex flex-col gap-[0.625rem]">
-            {renderDetails()}
-            {renderLocation()}
-          </div>
-        </div>
-        <div className="border border-neutral-200 rounded-md bg-white h-full p-6">
-          <h5 className="text-lg font-semibold mb-[0.625rem]">
-            Sensores do Dispositivo
-          </h5>
-          <DataTableBasic data={sensores} columns={sensorColumns} />
-        </div>
-        <div className="border border-neutral-200 rounded-md bg-white h-full p-6">
-          <h5 className="text-lg font-semibold mb-[0.625rem]">
-            Atuadores do Dispositivo
-          </h5>
+        <Card className="row-span-2">
+          <CardTitle>Informações básicas</CardTitle>
+          <CardContent>
+            <div className="flex flex-col gap-[0.625rem]">
+              {renderDetails()}
+              {renderLocation()}
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardTitle> Sensores do Dispositivo</CardTitle>
+          <CardContent>
+            <DataTableBasic data={sensores} columns={sensorColumns} />
+          </CardContent>
+        </Card>
+        <Card>
+          <CardTitle> Atuadores do Dispositivo</CardTitle>
           <DataTableBasic data={atuadores} columns={atuadorColumns} />
-        </div>
+        </Card>
       </main>
     </>
   )

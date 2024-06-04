@@ -58,6 +58,7 @@ import { atuadorColumnsDesassociation } from '@/domain/atuador/atuador-columns-d
 import { sensorColumnsAssociation } from '@/domain/sensor/sensor-columns-association'
 import { sensorColumnsDesassociation } from '@/domain/sensor/sensor-columns-desassociation'
 import { toast } from 'sonner'
+import { Card, CardContent, CardTitle } from '../../components/ui/card'
 
 const DispositivoCreatePage = () => {
   const [position, setPosition] = useState<
@@ -280,181 +281,189 @@ const DispositivoCreatePage = () => {
             </div>
           </div>
           <main className="grid grid-cols-2 gap-[0.625rem]">
-            <div className="row-span-2 border border-neutral-200 rounded-md bg-white h-full p-6">
-              <h5 className="text-lg font-semibold mb-[0.625rem]">
-                Informações básicas
-              </h5>
-              <FormField
-                control={form.control}
-                name="nome"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nome</FormLabel>
-                    <FormControl>
-                      <Input type="text" placeholder="" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="descricao"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Descrição</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        className="resize-none max-h-20"
-                        placeholder=""
-                        {...field}
+            <Card className="row-span-2">
+              <CardTitle>Informações básicas</CardTitle>
+              <CardContent className="row-span-2">
+                <FormField
+                  control={form.control}
+                  name="nome"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nome</FormLabel>
+                      <FormControl>
+                        <Input type="text" placeholder="" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="descricao"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Descrição</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          className="resize-none max-h-20"
+                          placeholder=""
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="endereco"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Endereço de IP</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="text"
+                          placeholder="000.000.000.000"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="gatewayId"
+                  render={({ field }) => (
+                    <FormItem className="flex items-center">
+                      <FormLabel>Gateway Associado</FormLabel>
+                      <FormControl>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Nenhum" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectGroup>
+                              {gateways &&
+                                gateways.map((gateway) => (
+                                  <SelectItem
+                                    key={gateway.id}
+                                    value={`${gateway.id}`}
+                                  >
+                                    {gateway.nome}
+                                  </SelectItem>
+                                ))}
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="local"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Localização</FormLabel>
+                      <FormControl>
+                        <Input type="text" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="mt-[0.625rem]">
+                  <GoogleMaps position={position} setPosition={setPosition} />
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardTitle>Sensores do Dispositivo</CardTitle>
+              <CardContent>
+                <Tabs defaultValue="available">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="associated">
+                      <span className="truncate">
+                        Associados ao Dispositivo
+                      </span>
+                    </TabsTrigger>
+                    <TabsTrigger value="available">
+                      <span className="truncate">
+                        Disponíveis para Associar
+                      </span>
+                    </TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="associated">
+                    {
+                      <DataTableBasic
+                        data={associatedSensores}
+                        columns={sensorColumnsDesassociation}
+                        meta={{
+                          onDesassociation: handleDisassociateSensor,
+                        }}
                       />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="endereco"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Endereço de IP</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="text"
-                        placeholder="000.000.000.000"
-                        {...field}
+                    }
+                  </TabsContent>
+                  <TabsContent value="available">
+                    {
+                      <DataTableBasic
+                        data={availableSensores}
+                        columns={sensorColumnsAssociation}
+                        meta={{
+                          onAssociation: handleAssociateSensor,
+                        }}
                       />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="gatewayId"
-                render={({ field }) => (
-                  <FormItem className="flex items-center">
-                    <FormLabel>Gateway Associado</FormLabel>
-                    <FormControl>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Nenhum" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            {gateways &&
-                              gateways.map((gateway) => (
-                                <SelectItem
-                                  key={gateway.id}
-                                  value={`${gateway.id}`}
-                                >
-                                  {gateway.nome}
-                                </SelectItem>
-                              ))}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="local"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Localização</FormLabel>
-                    <FormControl>
-                      <Input type="text" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <div className="mt-[0.625rem]">
-                <GoogleMaps position={position} setPosition={setPosition} />
-              </div>
-            </div>
-            <div className="border border-neutral-200 rounded-md bg-white h-full p-6">
-              <h5 className="text-lg font-semibold mb-[0.625rem]">
-                Sensores do Dispositivo
-              </h5>
-              <Tabs defaultValue="available">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="associated">
-                    <span className="truncate">Associados ao Dispositivo</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="available">
-                    <span className="truncate">Disponíveis para Associar</span>
-                  </TabsTrigger>
-                </TabsList>
-                <TabsContent value="associated">
-                  {
-                    <DataTableBasic
-                      data={associatedSensores}
-                      columns={sensorColumnsDesassociation}
-                      meta={{
-                        onDesassociation: handleDisassociateSensor,
-                      }}
-                    />
-                  }
-                </TabsContent>
-                <TabsContent value="available">
-                  {
-                    <DataTableBasic
-                      data={availableSensores}
-                      columns={sensorColumnsAssociation}
-                      meta={{
-                        onAssociation: handleAssociateSensor,
-                      }}
-                    />
-                  }
-                </TabsContent>
-              </Tabs>
-            </div>
-            <div className="border border-neutral-200 rounded-md bg-white h-full p-6">
-              <h5 className="text-lg font-semibold mb-[0.625rem]">
-                Atuadores do Dispositivo
-              </h5>
-              <Tabs defaultValue="available">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="associated">
-                    <span className="truncate">Associados ao Dispositivo</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="available">
-                    <span className="truncate">Disponíveis para Associar</span>
-                  </TabsTrigger>
-                </TabsList>
-                <TabsContent value="associated">
-                  {
-                    <DataTableBasic
-                      data={associatedAtuadores}
-                      columns={atuadorColumnsDesassociation}
-                      meta={{
-                        onDesassociation: handleDisassociateAtuador,
-                      }}
-                    />
-                  }
-                </TabsContent>
-                <TabsContent value="available">
-                  {
-                    <DataTableBasic
-                      data={availableAtuadores}
-                      columns={atuadorColumnsAssociation}
-                      meta={{
-                        onAssociation: handleAssociateAtuador,
-                      }}
-                    />
-                  }
-                </TabsContent>
-              </Tabs>
-            </div>
+                    }
+                  </TabsContent>
+                </Tabs>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardTitle>Atuadores do Dispositivo</CardTitle>
+              <CardContent>
+                <Tabs defaultValue="available">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="associated">
+                      <span className="truncate">
+                        Associados ao Dispositivo
+                      </span>
+                    </TabsTrigger>
+                    <TabsTrigger value="available">
+                      <span className="truncate">
+                        Disponíveis para Associar
+                      </span>
+                    </TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="associated">
+                    {
+                      <DataTableBasic
+                        data={associatedAtuadores}
+                        columns={atuadorColumnsDesassociation}
+                        meta={{
+                          onDesassociation: handleDisassociateAtuador,
+                        }}
+                      />
+                    }
+                  </TabsContent>
+                  <TabsContent value="available">
+                    {
+                      <DataTableBasic
+                        data={availableAtuadores}
+                        columns={atuadorColumnsAssociation}
+                        meta={{
+                          onAssociation: handleAssociateAtuador,
+                        }}
+                      />
+                    }
+                  </TabsContent>
+                </Tabs>
+              </CardContent>
+            </Card>
           </main>
         </form>
       </Form>

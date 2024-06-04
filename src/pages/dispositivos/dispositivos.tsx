@@ -32,7 +32,7 @@ const DispositivosPage = () => {
 
   return (
     <>
-      <div className="bg-neutral-50 p-4 h-full">
+      <div className="p-4 h-full w-full">
         <Outlet />
         {checkRoute()}
       </div>
