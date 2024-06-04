@@ -5,6 +5,8 @@ import { QueryFunctionContext, QueryKey } from '@tanstack/react-query'
 import { GetSensor } from '../sensor/get-sensor-dto'
 import { GetAtuador } from '../atuador/get-atuador-dto'
 import { UpdateDispositivo } from './update-dispositivo-dto'
+import { UpdateSensoresDispositivo } from './update-sensor-dispositivo'
+import { UpdateAtuadoresDispositivo } from './update-atuador-dispositivo'
 
 const baseUrl = 'http://localhost:8080/dispositivo'
 
@@ -61,6 +63,50 @@ const deleteDispositivo = async (dispositivoId: number) => {
   await fetchClient().delete(`${baseUrl}/${dispositivoId}`)
 }
 
+const addSensores = async ({
+  dispositivoId,
+  sensoresId,
+}: UpdateSensoresDispositivo) => {
+  const { status } = await fetchClient().post(
+    `${baseUrl}/${dispositivoId}/sensor`,
+    sensoresId,
+  )
+  return status
+}
+
+const removeSensores = async ({
+  dispositivoId,
+  sensoresId,
+}: UpdateSensoresDispositivo) => {
+  const { status } = await fetchClient().delete(
+    `${baseUrl}/${dispositivoId}/sensor`,
+    { data: sensoresId },
+  )
+  return status
+}
+
+const addAtuadores = async ({
+  dispositivoId,
+  atuadoresId,
+}: UpdateAtuadoresDispositivo) => {
+  const { status } = await fetchClient().post(
+    `${baseUrl}/${dispositivoId}/atuador`,
+    atuadoresId,
+  )
+  return status
+}
+
+const removeAtuadores = async ({
+  dispositivoId,
+  atuadoresId,
+}: UpdateAtuadoresDispositivo) => {
+  const { status } = await fetchClient().delete(
+    `${baseUrl}/${dispositivoId}/atuador`,
+    { data: atuadoresId },
+  )
+  return status
+}
+
 export {
   getDispositivoById,
   getDispositivos,
@@ -69,4 +115,8 @@ export {
   deleteDispositivo,
   getSensoresByDispositivoId,
   getAtuadoresByDispositivoId,
+  addSensores,
+  removeSensores,
+  addAtuadores,
+  removeAtuadores,
 }

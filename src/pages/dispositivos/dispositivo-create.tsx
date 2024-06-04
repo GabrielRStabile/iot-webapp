@@ -29,18 +29,22 @@ import {
   associateDispositivoWithGateway,
   getGateways,
 } from '@/domain/gateway/gateway-queries'
-import { createDispositivo } from '@/domain/dispositivo/dispositivo-queries'
+import {
+  addAtuadores,
+  addSensores,
+  createDispositivo,
+} from '@/domain/dispositivo/dispositivo-queries'
 import { CreateDispositivo } from '@/domain/dispositivo/create-dispositivo-dto'
 import { Link, useNavigate } from 'react-router-dom'
 import Dispositivo from '@/domain/dispositivo/dispositivo-interface'
 import { GetGateway } from '@/domain/gateway/get-gateway-dto'
 import { GetSensor } from '@/domain/sensor/get-sensor-dto'
 import { getSensores } from '@/domain/sensor/sensor-queries'
-import { sensorColumns } from '@/domain/sensor/sensor-columns'
+
 import { DataTableBasic } from '@/components/data-table-basic'
 import { GetAtuador } from '@/domain/atuador/get-atuador-dto'
 import { getAtuadores } from '@/domain/atuador/atuador-queries'
-import { atuadorColumns } from '@/domain/atuador/atuador-columns'
+
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -49,6 +53,10 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb'
 import { toast } from 'sonner'
+import { sensorColumnsDesassociation } from '@/domain/sensor/sensor-columns-desassociation'
+import { sensorColumnsAssociation } from '@/domain/sensor/sensor-columns-association'
+import { atuadorColumnsDesassociation } from '@/domain/atuador/atuador-columns-desassociation'
+import { atuadorColumnsAssociation } from '@/domain/atuador/atuador-columns-association'
 
 const DispositivoCreatePage = () => {
   const [position, setPosition] = useState<
@@ -87,6 +95,20 @@ const DispositivoCreatePage = () => {
     },
   })
 
+  const { mutateAsync: addSensoresFn } = useMutation({
+    mutationFn: addSensores,
+    onSuccess() {
+      queryClient.invalidateQueries({ queryKey: ['sensores'] })
+    },
+  })
+
+  const { mutateAsync: addAtuadoresFn } = useMutation({
+    mutationFn: addAtuadores,
+    onSuccess() {
+      queryClient.invalidateQueries({ queryKey: ['atuadores'] })
+    },
+  })
+
   const { data: gateways } = useQuery<GetGateway[]>({
     queryKey: ['gateways'],
     queryFn: getGateways,
@@ -106,6 +128,30 @@ const DispositivoCreatePage = () => {
   const [associatedSensores, setAssociatedSensores] = useState<GetSensor[]>([])
 
   const [availableAtuadores, setAvailableAtuadores] = useState<GetAtuador[]>([])
+  const [associatedAtuadores, setAssociatedAtuadores] = useState<GetAtuador[]>(
+    [],
+  )
+
+  const handleAssociateSensor = (sensor: GetSensor) => {
+    setAvailableSensores((prev) => prev.filter((s) => s.id !== sensor.id))
+    setAssociatedSensores((prev) => [...prev, sensor])
+  }
+
+  const handleDisassociateSensor = (sensor: GetSensor) => {
+    setAssociatedSensores((prev) => prev.filter((s) => s.id !== sensor.id))
+    setAvailableSensores((prev) => [...prev, sensor])
+  }
+
+  const handleAssociateAtuador = (atuador: GetAtuador) => {
+    setAvailableAtuadores((prev) => prev.filter((s) => s.id !== atuador.id))
+    setAssociatedAtuadores((prev) => [...prev, atuador])
+  }
+
+  const handleDisassociateAtuador = (atuador: GetAtuador) => {
+    setAssociatedAtuadores((prev) => prev.filter((s) => s.id !== atuador.id))
+    setAvailableAtuadores((prev) => [...prev, atuador])
+  }
+
   const createDispositivoSchema = z.object({
     nome: z.string().min(2),
     descricao: z.string().min(1),
@@ -137,11 +183,28 @@ const DispositivoCreatePage = () => {
       }
 
       const newDispositivo = await createDispositivoFn(dispositivo)
+      const dispositivoId = Number(newDispositivo.id)
 
       if (gatewayId) {
         await associateDispositivoWithGatewayFn({
           gatewayId: Number(gatewayId),
-          dispositivosId: [Number(newDispositivo.id)],
+          dispositivosId: [dispositivoId],
+        })
+      }
+
+      if (associatedSensores) {
+        const sensoresId = associatedSensores.map((sensor) => sensor.id)
+        await addSensoresFn({
+          dispositivoId,
+          sensoresId,
+        })
+      }
+
+      if (associatedAtuadores) {
+        const atuadoresId = associatedAtuadores.map((atuador) => atuador.id)
+        await addAtuadoresFn({
+          dispositivoId,
+          atuadoresId,
         })
       }
 
@@ -153,7 +216,6 @@ const DispositivoCreatePage = () => {
   }
 
   useEffect(() => {
-    setAssociatedSensores([])
     if (position) {
       setValue('local', `${position.lat}, ${position.lng}`)
     }
@@ -172,19 +234,19 @@ const DispositivoCreatePage = () => {
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink>
+            <BreadcrumbLink asChild>
               <Link to="/dashboard">Início</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbLink>
+            <BreadcrumbLink asChild>
               <Link to="/dashboard/dispositivos">Dispositivos</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbLink>
+            <BreadcrumbLink asChild>
               <Link to="/dashboard/dispositivos">Todos os Dispositivos</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
@@ -333,7 +395,10 @@ const DispositivoCreatePage = () => {
                   {
                     <DataTableBasic
                       data={associatedSensores}
-                      columns={sensorColumns}
+                      columns={sensorColumnsDesassociation}
+                      meta={{
+                        onDesassociation: handleDisassociateSensor,
+                      }}
                     />
                   }
                 </TabsContent>
@@ -341,7 +406,10 @@ const DispositivoCreatePage = () => {
                   {
                     <DataTableBasic
                       data={availableSensores}
-                      columns={sensorColumns}
+                      columns={sensorColumnsAssociation}
+                      meta={{
+                        onAssociation: handleAssociateSensor,
+                      }}
                     />
                   }
                 </TabsContent>
@@ -363,8 +431,11 @@ const DispositivoCreatePage = () => {
                 <TabsContent value="associated">
                   {
                     <DataTableBasic
-                      data={associatedSensores}
-                      columns={sensorColumns}
+                      data={associatedAtuadores}
+                      columns={atuadorColumnsDesassociation}
+                      meta={{
+                        onDesassociation: handleDisassociateAtuador,
+                      }}
                     />
                   }
                 </TabsContent>
@@ -372,7 +443,10 @@ const DispositivoCreatePage = () => {
                   {
                     <DataTableBasic
                       data={availableAtuadores}
-                      columns={atuadorColumns}
+                      columns={atuadorColumnsAssociation}
+                      meta={{
+                        onAssociation: handleAssociateAtuador,
+                      }}
                     />
                   }
                 </TabsContent>

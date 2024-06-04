@@ -25,17 +25,17 @@ const DispositivoDetailsPage = ({ id }: { id: string }) => {
   const navigate = useNavigate()
 
   const { data: dispositivo } = useQuery<Dispositivo>({
-    queryKey: ['dispositivoDetail', id],
+    queryKey: ['dispositivo', id],
     queryFn: getDispositivoById,
   })
 
   const { data: sensores = [] } = useQuery<GetSensor[]>({
-    queryKey: ['sensores', id],
+    queryKey: ['sensoresDispositivo', id],
     queryFn: getSensoresByDispositivoId,
   })
 
   const { data: atuadores = [] } = useQuery<GetAtuador[]>({
-    queryKey: ['atuadores', id],
+    queryKey: ['atuadoresDispositivo', id],
     queryFn: getAtuadoresByDispositivoId,
   })
 
@@ -130,7 +130,7 @@ const DispositivoDetailsPage = ({ id }: { id: string }) => {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbLink>Detalhes</BreadcrumbLink>
+            <BreadcrumbLink>Editar</BreadcrumbLink>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
