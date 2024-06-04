@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button'
-import { CirclePlus } from 'lucide-react'
+import { Save } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -32,19 +32,19 @@ import {
 import {
   addAtuadores,
   addSensores,
-  createDispositivo,
+  getAtuadoresByDispositivoId,
+  getDispositivoById,
+  getSensoresByDispositivoId,
+  removeAtuadores,
+  removeSensores,
+  updateDispositivo,
 } from '@/domain/dispositivo/dispositivo-queries'
-import { CreateDispositivo } from '@/domain/dispositivo/create-dispositivo-dto'
 import { Link, useNavigate } from 'react-router-dom'
 import Dispositivo from '@/domain/dispositivo/dispositivo-interface'
 import { GetGateway } from '@/domain/gateway/get-gateway-dto'
 import { GetSensor } from '@/domain/sensor/get-sensor-dto'
-import { getSensores } from '@/domain/sensor/sensor-queries'
-
 import { DataTableBasic } from '@/components/data-table-basic'
 import { GetAtuador } from '@/domain/atuador/get-atuador-dto'
-import { getAtuadores } from '@/domain/atuador/atuador-queries'
-
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -52,13 +52,16 @@ import {
   BreadcrumbList,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb'
+import { UpdateDispositivo } from '@/domain/dispositivo/update-dispositivo-dto'
 import { toast } from 'sonner'
 import { sensorColumnsDesassociation } from '@/domain/sensor/sensor-columns-desassociation'
 import { sensorColumnsAssociation } from '@/domain/sensor/sensor-columns-association'
 import { atuadorColumnsDesassociation } from '@/domain/atuador/atuador-columns-desassociation'
 import { atuadorColumnsAssociation } from '@/domain/atuador/atuador-columns-association'
+import { getSensores } from '@/domain/sensor/sensor-queries'
+import { getAtuadores } from '@/domain/atuador/atuador-queries'
 
-const DispositivoCreatePage = () => {
+const DispositivoEditPage = ({ id }: { id: string }) => {
   const [position, setPosition] = useState<
     google.maps.LatLngLiteral | undefined
   >()
@@ -66,8 +69,8 @@ const DispositivoCreatePage = () => {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
 
-  const { mutateAsync: createDispositivoFn } = useMutation({
-    mutationFn: createDispositivo,
+  const { mutateAsync: updateDispositivoFn } = useMutation({
+    mutationFn: updateDispositivo,
     onSuccess(newDispositivo) {
       queryClient.setQueryData<Dispositivo[]>(['dispositivos'], (data) => {
         if (data) {
@@ -101,6 +104,12 @@ const DispositivoCreatePage = () => {
       queryClient.invalidateQueries({ queryKey: ['sensores'] })
     },
   })
+  const { mutateAsync: removeSensoresFn } = useMutation({
+    mutationFn: removeSensores,
+    onSuccess() {
+      queryClient.invalidateQueries({ queryKey: ['sensores'] })
+    },
+  })
 
   const { mutateAsync: addAtuadoresFn } = useMutation({
     mutationFn: addAtuadores,
@@ -108,29 +117,56 @@ const DispositivoCreatePage = () => {
       queryClient.invalidateQueries({ queryKey: ['atuadores'] })
     },
   })
+  const { mutateAsync: removeAtuadoresFn } = useMutation({
+    mutationFn: removeAtuadores,
+    onSuccess() {
+      queryClient.invalidateQueries({ queryKey: ['atuadores'] })
+    },
+  })
 
-  const { data: gateways } = useQuery<GetGateway[]>({
+  const { data: dispositivo, isLoading } = useQuery<Dispositivo>({
+    queryKey: ['dispositivo', id],
+    queryFn: getDispositivoById,
+  })
+
+  const { data: gateways = [] } = useQuery<GetGateway[]>({
     queryKey: ['gateways'],
     queryFn: getGateways,
   })
 
-  const { data: sensores } = useQuery<GetSensor[]>({
+  const { data: sensoresDispositivo = [] } = useQuery<GetSensor[]>({
+    queryKey: ['sensoresDispositivo', id],
+    queryFn: getSensoresByDispositivoId,
+  })
+
+  const { data: atuadoresDispositivo = [] } = useQuery<GetAtuador[]>({
+    queryKey: ['atuadoresDispositivo', id],
+    queryFn: getAtuadoresByDispositivoId,
+  })
+
+  const { data: allSensores = [] } = useQuery<GetSensor[]>({
     queryKey: ['sensores'],
     queryFn: getSensores,
   })
 
-  const { data: atuadores } = useQuery<GetAtuador[]>({
+  const { data: allAtuadores = [] } = useQuery<GetAtuador[]>({
     queryKey: ['atuadores'],
     queryFn: getAtuadores,
   })
 
   const [availableSensores, setAvailableSensores] = useState<GetSensor[]>([])
   const [associatedSensores, setAssociatedSensores] = useState<GetSensor[]>([])
+  const [initialAssociatedSensores, setInitialAssociatedSensores] = useState<
+    GetSensor[]
+  >([])
 
   const [availableAtuadores, setAvailableAtuadores] = useState<GetAtuador[]>([])
   const [associatedAtuadores, setAssociatedAtuadores] = useState<GetAtuador[]>(
     [],
   )
+  const [initialAssociatedAtuadores, setInitialAssociatedAtuadores] = useState<
+    GetAtuador[]
+  >([])
 
   const handleAssociateSensor = (sensor: GetSensor) => {
     setAvailableSensores((prev) => prev.filter((s) => s.id !== sensor.id))
@@ -175,43 +211,71 @@ const DispositivoCreatePage = () => {
   async function onSubmit(values: z.infer<typeof createDispositivoSchema>) {
     try {
       const { nome, descricao, endereco, local, gatewayId } = values
-      const dispositivo: CreateDispositivo = {
-        nome,
-        descricao,
-        endereco,
-        local,
+      const newDispositivo: UpdateDispositivo = {
+        id: Number(id),
+        newData: {
+          nome,
+          descricao,
+          endereco,
+          local,
+        },
       }
 
-      const newDispositivo = await createDispositivoFn(dispositivo)
-      const dispositivoId = Number(newDispositivo.id)
+      const updatedDispositivo = await updateDispositivoFn(newDispositivo)
 
       if (gatewayId) {
         await associateDispositivoWithGatewayFn({
           gatewayId: Number(gatewayId),
-          dispositivosId: [dispositivoId],
+          dispositivosId: [Number(updatedDispositivo.id)],
         })
       }
 
-      if (associatedSensores) {
-        const sensoresId = associatedSensores.map((sensor) => sensor.id)
+      const sensoresToAdd = associatedSensores.filter(
+        (sensor) => !initialAssociatedSensores.includes(sensor),
+      )
+      const sensoresToRemove = initialAssociatedSensores.filter(
+        (sensor) => !associatedSensores.includes(sensor),
+      )
+
+      const atuadoresToAdd = associatedAtuadores.filter(
+        (atuador) => !initialAssociatedAtuadores.includes(atuador),
+      )
+      const atuadoresToRemove = initialAssociatedAtuadores.filter(
+        (atuador) => !associatedAtuadores.includes(atuador),
+      )
+
+      if (sensoresToAdd.length > 0) {
         await addSensoresFn({
-          dispositivoId,
-          sensoresId,
+          dispositivoId: Number(id),
+          sensoresId: sensoresToAdd.map((s) => s.id),
         })
       }
 
-      if (associatedAtuadores) {
-        const atuadoresId = associatedAtuadores.map((atuador) => atuador.id)
+      if (sensoresToRemove.length > 0) {
+        await removeSensoresFn({
+          dispositivoId: Number(id),
+          sensoresId: sensoresToRemove.map((s) => s.id),
+        })
+      }
+
+      if (atuadoresToAdd.length > 0) {
         await addAtuadoresFn({
-          dispositivoId,
-          atuadoresId,
+          dispositivoId: Number(id),
+          atuadoresId: atuadoresToAdd.map((s) => s.id),
         })
       }
 
-      toast.success('Dispositivo criado com sucesso!')
+      if (atuadoresToRemove.length > 0) {
+        await removeAtuadoresFn({
+          dispositivoId: Number(id),
+          atuadoresId: atuadoresToRemove.map((s) => s.id),
+        })
+      }
+
+      toast.success('Dispositivo atualizado com sucesso!')
       navigate('/dashboard/dispositivos')
     } catch (err) {
-      toast.error('Ops! Um erro ocorreu ao criar o dispositivo.')
+      toast.error('Ops! Um erro ocorreu ao atualizar o dispositivo.')
     }
   }
 
@@ -219,15 +283,54 @@ const DispositivoCreatePage = () => {
     if (position) {
       setValue('local', `${position.lat}, ${position.lng}`)
     }
-    if (sensores) {
-      const disponiveis = sensores.filter((sensor) => !sensor.dispositivoId)
+    if (sensoresDispositivo) {
+      setInitialAssociatedSensores(sensoresDispositivo)
+      setAssociatedSensores(sensoresDispositivo)
+    }
+    if (atuadoresDispositivo) {
+      setInitialAssociatedAtuadores(atuadoresDispositivo)
+      setAssociatedAtuadores(atuadoresDispositivo)
+    }
+    if (allSensores) {
+      const disponiveis = allSensores.filter((sensor) => !sensor.dispositivoId)
       setAvailableSensores(disponiveis)
     }
-    if (atuadores) {
-      const disponiveis = atuadores.filter((atuador) => !atuador.dispositivoId)
+    if (allAtuadores) {
+      const disponiveis = allAtuadores.filter(
+        (atuador) => !atuador.dispositivoId,
+      )
       setAvailableAtuadores(disponiveis)
     }
-  }, [position, setValue, sensores, atuadores])
+  }, [
+    position,
+    setValue,
+    sensoresDispositivo,
+    atuadoresDispositivo,
+    dispositivo,
+    allAtuadores,
+    allSensores,
+  ])
+
+  useEffect(() => {
+    if (dispositivo) {
+      const [lat, lng] = dispositivo.local.split(', ').map(Number)
+      setPosition({ lat, lng })
+
+      const createDispositivo = {
+        nome: dispositivo.nome,
+        descricao: dispositivo.descricao,
+        endereco: dispositivo.endereco,
+        local: dispositivo.local,
+        gatewayId: dispositivo.gatewayId?.toString() ?? undefined,
+      }
+
+      form.reset(createDispositivo)
+    }
+  }, [form, dispositivo])
+
+  if (isLoading) {
+    return <div>carregando...</div>
+  }
 
   return (
     <div>
@@ -260,7 +363,7 @@ const DispositivoCreatePage = () => {
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="flex justify-between items-center mb-3">
             <h4 className="scroll-m-20 text-xl font-semibold tracking-tight">
-              Adicionar novo Dispositivo
+              {`Editando ${dispositivo?.nome}`}
             </h4>
             <div className="flex items-center gap-[0.625rem]">
               <Button
@@ -271,8 +374,8 @@ const DispositivoCreatePage = () => {
                 Voltar
               </Button>
               <Button type="submit" className="capitalize">
-                <CirclePlus className="mr-2" size="16" />
-                Adicionar Dispositivo
+                <Save className="mr-2" size="16" />
+                Salvar Alterações
               </Button>
             </div>
           </div>
@@ -337,7 +440,7 @@ const DispositivoCreatePage = () => {
                     <FormControl>
                       <Select
                         onValueChange={field.onChange}
-                        defaultValue={field.value}
+                        defaultValue={dispositivo?.gatewayId?.toString()}
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Nenhum" />
@@ -382,7 +485,7 @@ const DispositivoCreatePage = () => {
               <h5 className="text-lg font-semibold mb-[0.625rem]">
                 Sensores do Dispositivo
               </h5>
-              <Tabs defaultValue="available">
+              <Tabs defaultValue="associated">
                 <TabsList className="grid w-full grid-cols-2">
                   <TabsTrigger value="associated">
                     <span className="truncate">Associados ao Dispositivo</span>
@@ -419,7 +522,7 @@ const DispositivoCreatePage = () => {
               <h5 className="text-lg font-semibold mb-[0.625rem]">
                 Atuadores do Dispositivo
               </h5>
-              <Tabs defaultValue="available">
+              <Tabs defaultValue="associated">
                 <TabsList className="grid w-full grid-cols-2">
                   <TabsTrigger value="associated">
                     <span className="truncate">Associados ao Dispositivo</span>
@@ -459,4 +562,4 @@ const DispositivoCreatePage = () => {
   )
 }
 
-export default DispositivoCreatePage
+export default DispositivoEditPage
