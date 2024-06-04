@@ -9,8 +9,8 @@ import {
 
 import ThemeSwitcher from '@/components/ui/theme-switcher'
 import { dispositivoColumns } from '@/domain/dispositivo/dispositivo-columns'
-import { useQuery } from '@tanstack/react-query'
 import { getDispositivos } from '@/domain/dispositivo/dispositivo-queries'
+import { useQuery } from '@tanstack/react-query'
 import { Outlet, useLocation } from 'react-router-dom'
 import DispositivoCreatePage from './dispositivo-create'
 
