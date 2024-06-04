@@ -9,7 +9,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 import { CirclePlus, FileSpreadsheet } from 'lucide-react'
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from './ui/button'
 import { Search } from './ui/input'
@@ -38,6 +38,7 @@ interface DataTableProps<TData, TValue> {
   isLoading?: boolean
   hideHeadingButtons?: boolean
   meta?: TableMeta<TData>
+  customAddButton?: React.ReactNode
 }
 
 export function DataTable<TData, TValue>({
@@ -47,6 +48,7 @@ export function DataTable<TData, TValue>({
   isLoading,
   hideHeadingButtons,
   meta,
+  customAddButton,
 }: DataTableProps<TData, TValue>) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 
@@ -88,15 +90,17 @@ export function DataTable<TData, TValue>({
           }
         />
         {!hideHeadingButtons && (
-          <div>
+          <div className="flex items-center">
             <Button variant="outline" className="mr-[0.625rem]">
               <FileSpreadsheet className="mr-2" size="16" />
               Exportar
             </Button>
-            <Button className="capitalize" onClick={() => navigate('./new')}>
-              <CirclePlus className="mr-2" size="16" />
-              Adicionar {dataType}
-            </Button>
+            {customAddButton || (
+              <Button className="capitalize" onClick={() => navigate('./new')}>
+                <CirclePlus className="mr-2" size="16" />
+                Adicionar {dataType}
+              </Button>
+            )}
           </div>
         )}
       </div>

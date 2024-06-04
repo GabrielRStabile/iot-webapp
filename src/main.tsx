@@ -17,6 +17,7 @@ import GatewayCreatePage from './pages/gateways/gateway-create-page'
 import GatewayEditPage from './pages/gateways/gateway-edit-page'
 import GatewaysPage from './pages/gateways/gateways-page'
 import { APIProvider } from '@vis.gl/react-google-maps'
+import AtuadoresPage from './pages/atuadores/atuadores'
 
 const router = createBrowserRouter([
   {
@@ -65,6 +66,10 @@ const router = createBrowserRouter([
       {
         path: 'gateways/:id/edit',
         element: <GatewayEditPage />,
+      },
+      {
+        path: 'atuadores',
+        element: <AtuadoresPage />,
       },
     ],
   },
