@@ -35,6 +35,7 @@ const DispositivoDetailsPage = ({ id }: { id: string }) => {
   const { data: gateway } = useQuery<GetGatewayDTO>({
     queryKey: ['gateway', dispositivo?.gatewayId],
     queryFn: () => getGatewayById(dispositivo?.gatewayId?.toString() || ''),
+    enabled: !!dispositivo?.gatewayId,
   })
 
   const { data: sensores = [] } = useQuery<GetSensor[]>({
@@ -139,7 +140,7 @@ const DispositivoDetailsPage = ({ id }: { id: string }) => {
         </BreadcrumbList>
       </Breadcrumb>
 
-      <div className="flex justify-between items-center mb-3">
+      <div className="flex justify-between items-center">
         <h4>Detalhes de {dispositivo.nome}</h4>
         <Button
           variant="outline"

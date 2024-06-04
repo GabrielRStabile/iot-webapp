@@ -35,6 +35,7 @@ import {
 } from '@/domain/dispositivo/dispositivo-queries'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { CirclePlus } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
@@ -114,10 +115,13 @@ const AtuadoresCreateSheet = () => {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="default">Adicionar Atuador</Button>
+        <Button variant="default">
+          <CirclePlus className="mr-2" size="16" />
+          Adicionar Atuador
+        </Button>
       </SheetTrigger>
       <SheetContent>
-        <SheetHeader>
+        <SheetHeader className="mb-6">
           <SheetTitle>Adicionar novo Atuador</SheetTitle>
           <SheetDescription>
             Adicione um novo atuador aqui, clique em adicionar quando tiver
