@@ -2,9 +2,9 @@ import fetchClient from '@/services/fetch-client'
 import { CreateDispositivo } from './create-dispositivo-dto'
 import Dispositivo from './dispositivo-interface'
 
-const baseUrl = 'http://localhost:8080/dispositivo'
+const baseUrl = `${import.meta.env.VITE_IOT_API}/dispositivo`
 
-const getDispositivos = async () => {
+const getDispositivos = async (): Promise<Dispositivo[]> => {
   const { data } = await fetchClient().get(baseUrl)
   return data
 }
@@ -25,4 +25,4 @@ const deleteDispositivo = async (dispositivoId: number) => {
   await fetchClient().delete(`${baseUrl}/${dispositivoId}`)
 }
 
-export { getDispositivos, createDispositivo, deleteDispositivo }
+export { createDispositivo, deleteDispositivo, getDispositivos }
