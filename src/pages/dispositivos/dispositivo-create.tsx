@@ -31,7 +31,7 @@ import {
   getGatewayByPersonId,
 } from '@/domain/gateway/gateway-queries'
 import { GetGatewayDTO } from '@/domain/gateway/get-gateway-dto'
-import { GetSensor } from '@/domain/sensor/get-sensor-dto'
+import { GetSensorDTO } from '@/domain/sensor/get-sensor-dto'
 import { getSensores } from '@/domain/sensor/sensor-queries'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -118,7 +118,7 @@ const DispositivoCreatePage = () => {
     queryFn: () => getGatewayByPersonId(user?.id ?? ''),
   })
 
-  const { data: sensores } = useQuery<GetSensor[]>({
+  const { data: sensores } = useQuery<GetSensorDTO[]>({
     queryKey: ['sensores'],
     queryFn: getSensores,
   })
@@ -128,20 +128,20 @@ const DispositivoCreatePage = () => {
     queryFn: getAtuadores,
   })
 
-  const [availableSensores, setAvailableSensores] = useState<GetSensor[]>([])
-  const [associatedSensores, setAssociatedSensores] = useState<GetSensor[]>([])
+  const [availableSensores, setAvailableSensores] = useState<GetSensorDTO[]>([])
+  const [associatedSensores, setAssociatedSensores] = useState<GetSensorDTO[]>([])
 
   const [availableAtuadores, setAvailableAtuadores] = useState<GetAtuador[]>([])
   const [associatedAtuadores, setAssociatedAtuadores] = useState<GetAtuador[]>(
     [],
   )
 
-  const handleAssociateSensor = (sensor: GetSensor) => {
+  const handleAssociateSensor = (sensor: GetSensorDTO) => {
     setAvailableSensores((prev) => prev.filter((s) => s.id !== sensor.id))
     setAssociatedSensores((prev) => [...prev, sensor])
   }
 
-  const handleDisassociateSensor = (sensor: GetSensor) => {
+  const handleDisassociateSensor = (sensor: GetSensorDTO) => {
     setAssociatedSensores((prev) => prev.filter((s) => s.id !== sensor.id))
     setAvailableSensores((prev) => [...prev, sensor])
   }

@@ -15,7 +15,7 @@ import {
   getDispositivoById,
   getSensoresByDispositivoId,
 } from '@/domain/dispositivo/dispositivo-queries'
-import { GetSensor } from '@/domain/sensor/get-sensor-dto'
+import { GetSensorDTO } from '@/domain/sensor/get-sensor-dto'
 import { sensorColumns } from '@/domain/sensor/sensor-columns'
 import { useQuery } from '@tanstack/react-query'
 import { Map, Marker } from '@vis.gl/react-google-maps'
@@ -30,7 +30,7 @@ const DispositivoDetailsPage = ({ id }: { id: string }) => {
     queryFn: getDispositivoById,
   })
 
-  const { data: sensores = [] } = useQuery<GetSensor[]>({
+  const { data: sensores = [] } = useQuery<GetSensorDTO[]>({
     queryKey: ['sensoresDispositivo', id],
     queryFn: getSensoresByDispositivoId,
   })

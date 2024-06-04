@@ -1,12 +1,12 @@
 import fetchClient from '@/services/fetch-client'
+import { QueryFunctionContext, QueryKey } from '@tanstack/react-query'
+import { GetAtuador } from '../atuador/get-atuador-dto'
+import { GetSensorDTO } from '../sensor/get-sensor-dto'
 import { CreateDispositivo } from './create-dispositivo-dto'
 import Dispositivo from './dispositivo-interface'
-import { QueryFunctionContext, QueryKey } from '@tanstack/react-query'
-import { GetSensor } from '../sensor/get-sensor-dto'
-import { GetAtuador } from '../atuador/get-atuador-dto'
+import { UpdateAtuadoresDispositivo } from './update-atuador-dispositivo'
 import { UpdateDispositivo } from './update-dispositivo-dto'
 import { UpdateSensoresDispositivo } from './update-sensor-dispositivo'
-import { UpdateAtuadoresDispositivo } from './update-atuador-dispositivo'
 
 const baseUrl = `${import.meta.env.VITE_IOT_API}/dispositivo`
 
@@ -20,7 +20,7 @@ const getDispositivoById = async ({
 
 const getSensoresByDispositivoId = async ({
   queryKey,
-}: QueryFunctionContext<QueryKey>): Promise<GetSensor[]> => {
+}: QueryFunctionContext<QueryKey>): Promise<GetSensorDTO[]> => {
   const [, id] = queryKey
   const { data } = await fetchClient().get(`${baseUrl}/${id}/sensor`)
   return data
@@ -108,15 +108,7 @@ const removeAtuadores = async ({
 }
 
 export {
-  getDispositivoById,
-  getDispositivos,
-  createDispositivo,
-  updateDispositivo,
-  deleteDispositivo,
-  getSensoresByDispositivoId,
-  getAtuadoresByDispositivoId,
-  addSensores,
-  removeSensores,
-  addAtuadores,
-  removeAtuadores,
+  addAtuadores, addSensores, createDispositivo, deleteDispositivo, getAtuadoresByDispositivoId, getDispositivoById,
+  getDispositivos, getSensoresByDispositivoId, removeAtuadores, removeSensores, updateDispositivo
 }
+
