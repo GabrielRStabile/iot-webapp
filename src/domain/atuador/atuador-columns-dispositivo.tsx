@@ -24,6 +24,7 @@ export const atuadorColumnsDispositivo: ColumnDef<GetAtuador>[] = [
       const { data: dispositivo } = useQuery<Dispositivo>({
         queryKey: ['dispositivo', dispositivoId],
         queryFn: getDispositivoById,
+        enabled: !!dispositivoId,
       })
 
       if (dispositivo) {
