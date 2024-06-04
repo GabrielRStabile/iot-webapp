@@ -21,6 +21,8 @@ import { useQuery } from '@tanstack/react-query'
 import { Map, Marker } from '@vis.gl/react-google-maps'
 import { Link, useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardTitle } from '../../components/ui/card'
+import { GetGatewayDTO } from '@/domain/gateway/get-gateway-dto'
+import { getGatewayById } from '@/domain/gateway/gateway-queries'
 
 const DispositivoDetailsPage = ({ id }: { id: string }) => {
   const navigate = useNavigate()
@@ -28,6 +30,11 @@ const DispositivoDetailsPage = ({ id }: { id: string }) => {
   const { data: dispositivo } = useQuery<Dispositivo>({
     queryKey: ['dispositivo', id],
     queryFn: getDispositivoById,
+  })
+
+  const { data: gateway } = useQuery<GetGatewayDTO>({
+    queryKey: ['gateway', dispositivo?.gatewayId],
+    queryFn: () => getGatewayById(dispositivo?.gatewayId?.toString() || ''),
   })
 
   const { data: sensores = [] } = useQuery<GetSensor[]>({
@@ -51,7 +58,7 @@ const DispositivoDetailsPage = ({ id }: { id: string }) => {
   const formatValue = (key: string, value: Dispositivo[keyof Dispositivo]) => {
     switch (key) {
       case 'gatewayId':
-        return value === null ? 'Nenhum' : value
+        return value === null ? 'Nenhum' : gateway?.nome
       default:
         return value
     }
@@ -68,7 +75,7 @@ const DispositivoDetailsPage = ({ id }: { id: string }) => {
         )
         return (
           <div key={key}>
-            <h6>{displayName}</h6>
+            <h6 className="font-medium">{displayName}</h6>
             <span>{displayValue}</span>
           </div>
         )
