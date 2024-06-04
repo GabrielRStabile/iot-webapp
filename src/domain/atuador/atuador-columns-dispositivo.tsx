@@ -3,6 +3,9 @@ import { Button } from '@/components/ui/button'
 import { Edit } from 'lucide-react'
 import { GetAtuador } from './get-atuador-dto'
 import ConfirmDeleteDialog from '@/components/confirm-delete-dialog'
+import { useQuery } from '@tanstack/react-query'
+import Dispositivo from '../dispositivo/dispositivo-interface'
+import { getDispositivoById } from '../dispositivo/dispositivo-queries'
 
 export const atuadorColumnsDispositivo: ColumnDef<GetAtuador>[] = [
   {
@@ -12,6 +15,18 @@ export const atuadorColumnsDispositivo: ColumnDef<GetAtuador>[] = [
   {
     accessorKey: 'dispositivoId',
     header: 'Dispositivo Vinculado',
+    cell: function CellComponent({ row }) {
+      const dispositivoId = row.original.dispositivoId
+
+      const { data: dispositivo } = useQuery<Dispositivo>({
+        queryKey: ['dispositivo', dispositivoId],
+        queryFn: getDispositivoById,
+      })
+
+      if (dispositivo) {
+        return dispositivo.nome
+      }
+    },
   },
   {
     id: 'actions',

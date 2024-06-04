@@ -3,7 +3,6 @@ import { atuadorColumnsDispositivo } from '@/domain/atuador/atuador-columns-disp
 import { getAtuadores } from '@/domain/atuador/atuador-queries'
 import { GetAtuador } from '@/domain/atuador/get-atuador-dto'
 import { useQuery } from '@tanstack/react-query'
-import { useEffect } from 'react'
 
 const AtuadoresListPage = () => {
   // const queryClient = useQueryClient()
@@ -12,8 +11,6 @@ const AtuadoresListPage = () => {
     queryKey: ['atuadores'],
     queryFn: getAtuadores,
   })
-
-  useEffect(() => {})
 
   if (isLoading) return <p>carregando...</p>
 
