@@ -14,6 +14,7 @@ import LoginPage from './pages/auth/login-page'
 import SignUpPage from './pages/auth/signup-page'
 import DispositivosPage from './pages/dispositivos/dispositivos'
 import { APIProvider } from '@vis.gl/react-google-maps'
+import AtuadoresPage from './pages/atuadores/atuadores'
 
 const router = createBrowserRouter([
   {
@@ -50,6 +51,10 @@ const router = createBrowserRouter([
             path: ':dispositivoId/edit',
           },
         ],
+      },
+      {
+        path: 'atuadores',
+        element: <AtuadoresPage />,
       },
     ],
   },
