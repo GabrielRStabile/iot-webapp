@@ -307,6 +307,8 @@ const DispositivoEditPage = ({ id }: { id: string }) => {
     sensoresDispositivo,
     atuadoresDispositivo,
     dispositivo,
+    allAtuadores,
+    allSensores,
   ])
 
   useEffect(() => {
