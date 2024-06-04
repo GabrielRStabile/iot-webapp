@@ -15,6 +15,8 @@ import {
   getDispositivoById,
   getSensoresByDispositivoId,
 } from '@/domain/dispositivo/dispositivo-queries'
+import { getGatewayById } from '@/domain/gateway/gateway-queries'
+import { GetGatewayDTO } from '@/domain/gateway/get-gateway-dto'
 import { GetSensorDTO } from '@/domain/sensor/get-sensor-dto'
 import { sensorColumns } from '@/domain/sensor/sensor-columns'
 import { useQuery } from '@tanstack/react-query'
@@ -28,6 +30,12 @@ const DispositivoDetailsPage = ({ id }: { id: string }) => {
   const { data: dispositivo } = useQuery<Dispositivo>({
     queryKey: ['dispositivo', id],
     queryFn: getDispositivoById,
+  })
+
+  const { data: gateway } = useQuery<GetGatewayDTO>({
+    queryKey: ['gateway', dispositivo?.gatewayId],
+    queryFn: () => getGatewayById(dispositivo?.gatewayId?.toString() || ''),
+    enabled: !!dispositivo?.gatewayId,
   })
 
   const { data: sensores = [] } = useQuery<GetSensorDTO[]>({
@@ -51,7 +59,7 @@ const DispositivoDetailsPage = ({ id }: { id: string }) => {
   const formatValue = (key: string, value: Dispositivo[keyof Dispositivo]) => {
     switch (key) {
       case 'gatewayId':
-        return value === null ? 'Nenhum' : value
+        return value === null ? 'Nenhum' : gateway?.nome
       default:
         return value
     }
@@ -68,7 +76,7 @@ const DispositivoDetailsPage = ({ id }: { id: string }) => {
         )
         return (
           <div key={key}>
-            <h6>{displayName}</h6>
+            <h6 className="font-medium">{displayName}</h6>
             <span>{displayValue}</span>
           </div>
         )
@@ -105,19 +113,19 @@ const DispositivoDetailsPage = ({ id }: { id: string }) => {
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink>
+            <BreadcrumbLink asChild>
               <Link to="/dashboard">Início</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbLink>
+            <BreadcrumbLink asChild>
               <Link to="/dashboard/dispositivos">Dispositivos</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbLink>
+            <BreadcrumbLink asChild>
               <Link to="/dashboard/dispositivos">Todos os Dispositivos</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
@@ -132,7 +140,7 @@ const DispositivoDetailsPage = ({ id }: { id: string }) => {
         </BreadcrumbList>
       </Breadcrumb>
 
-      <div className="flex justify-between items-center mb-3">
+      <div className="flex justify-between items-center">
         <h4>Detalhes de {dispositivo.nome}</h4>
         <Button
           variant="outline"

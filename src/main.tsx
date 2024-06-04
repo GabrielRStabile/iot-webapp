@@ -11,6 +11,7 @@ import { AuthProvider } from './contexts/auth-context'
 import './index.css'
 import { queryClient } from './lib/react-query'
 import App from './pages/app'
+import AtuadoresPage from './pages/atuadores/atuadores'
 import LoginPage from './pages/auth/login-page'
 import SignUpPage from './pages/auth/signup-page'
 import DispositivosPage from './pages/dispositivos/dispositivos'
@@ -70,6 +71,8 @@ const router = createBrowserRouter([
       {
         path: 'sensores',
         element: <SensoresPage />,
+        path: 'atuadores',
+        element: <AtuadoresPage />,
       },
     ],
   },

@@ -5,10 +5,12 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Button } from '@/components/ui/button'
 import { Edit, Eye } from 'lucide-react'
 import ConfirmDeleteDialog from '@/components/confirm-delete-dialog'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { deleteDispositivo } from './dispositivo-queries'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
+import { GetGatewayDTO } from '../gateway/get-gateway-dto'
+import { getGatewayById } from '../gateway/gateway-queries'
 
 export const dispositivoColumns: ColumnDef<Dispositivo>[] = [
   {
@@ -52,13 +54,19 @@ export const dispositivoColumns: ColumnDef<Dispositivo>[] = [
   {
     accessorKey: 'gatewayId',
     header: 'Gateway Vinculado',
-    cell: ({ getValue }) => {
-      const value = getValue<number | null>()
-      return value === null ? (
-        'Nenhum'
-      ) : (
-        <Badge variant="outline">{value}</Badge>
-      )
+    cell: function CellComponent({ row }) {
+      const gatewayId = row.original.gatewayId
+
+      const { data: gateway } = useQuery<GetGatewayDTO>({
+        queryKey: ['gateway', gatewayId?.toString()],
+        queryFn: () => getGatewayById(gatewayId?.toString() || ''),
+      })
+
+      if (gateway) {
+        return <Badge variant="outline">{gateway.nome}</Badge>
+      } else {
+        return 'Nenhum'
+      }
     },
   },
   {
