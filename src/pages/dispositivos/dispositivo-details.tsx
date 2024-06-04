@@ -105,19 +105,19 @@ const DispositivoDetailsPage = ({ id }: { id: string }) => {
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink>
+            <BreadcrumbLink asChild>
               <Link to="/dashboard">Início</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbLink>
+            <BreadcrumbLink asChild>
               <Link to="/dashboard/dispositivos">Dispositivos</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbLink>
+            <BreadcrumbLink asChild>
               <Link to="/dashboard/dispositivos">Todos os Dispositivos</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
