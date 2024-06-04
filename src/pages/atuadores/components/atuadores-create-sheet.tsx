@@ -90,7 +90,6 @@ const AtuadoresCreateSheet = () => {
   })
 
   async function onSubmit(values: z.infer<typeof createAtuadorSchema>) {
-    console.log('oi teste')
     try {
       const { nome, dispositivoId } = values
       const atuador: CreateAtuadorDTO = {

@@ -1,6 +1,4 @@
 import { ColumnDef } from '@tanstack/react-table'
-import { Button } from '@/components/ui/button'
-import { Edit } from 'lucide-react'
 import { GetAtuador } from './get-atuador-dto'
 import ConfirmDeleteDialog from '@/components/confirm-delete-dialog'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -9,6 +7,7 @@ import { getDispositivoById } from '../dispositivo/dispositivo-queries'
 import { Badge } from '@/components/ui/badge'
 import { deleteAtuadorById } from './atuador-queries'
 import { toast } from 'sonner'
+import AtuadoresEditSheet from '@/pages/atuadores/components/atuadores-edit-sheet'
 
 export const atuadorColumnsDispositivo: ColumnDef<GetAtuador>[] = [
   {
@@ -67,14 +66,7 @@ export const atuadorColumnsDispositivo: ColumnDef<GetAtuador>[] = [
       return (
         <div className="flex gap-[0.625rem]">
           <ConfirmDeleteDialog onConfirm={handleDeleteAtuador} />
-          <Button
-            onClick={() => {}}
-            type="button"
-            variant="outline"
-            className="py-2 px-3"
-          >
-            <Edit size="16" />
-          </Button>
+          <AtuadoresEditSheet id={`${atuadorId}`} />
         </div>
       )
     },
