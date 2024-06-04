@@ -6,6 +6,7 @@ import ConfirmDeleteDialog from '@/components/confirm-delete-dialog'
 import { useQuery } from '@tanstack/react-query'
 import Dispositivo from '../dispositivo/dispositivo-interface'
 import { getDispositivoById } from '../dispositivo/dispositivo-queries'
+import { Badge } from '@/components/ui/badge'
 
 export const atuadorColumnsDispositivo: ColumnDef<GetAtuador>[] = [
   {
@@ -24,7 +25,9 @@ export const atuadorColumnsDispositivo: ColumnDef<GetAtuador>[] = [
       })
 
       if (dispositivo) {
-        return dispositivo.nome
+        return <Badge variant="outline">{dispositivo.nome}</Badge>
+      } else {
+        return 'Nenhum'
       }
     },
   },
