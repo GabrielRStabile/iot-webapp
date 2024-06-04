@@ -62,6 +62,7 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 import { Card, CardContent, CardTitle } from '../../components/ui/card'
 import { useAuth } from '../../contexts/auth-context'
+import { LoadingSpinner } from '@/components/ui/loading-spinner'
 
 const DispositivoEditPage = ({ id }: { id: string }) => {
   const [position, setPosition] = useState<
@@ -332,9 +333,7 @@ const DispositivoEditPage = ({ id }: { id: string }) => {
     }
   }, [form, dispositivo])
 
-  if (isLoading) {
-    return <div>carregando...</div>
-  }
+  if (isLoading) return <LoadingSpinner />
 
   return (
     <div>

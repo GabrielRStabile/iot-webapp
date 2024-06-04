@@ -23,11 +23,12 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardTitle } from '../../components/ui/card'
 import { GetGatewayDTO } from '@/domain/gateway/get-gateway-dto'
 import { getGatewayById } from '@/domain/gateway/gateway-queries'
+import { LoadingSpinner } from '@/components/ui/loading-spinner'
 
 const DispositivoDetailsPage = ({ id }: { id: string }) => {
   const navigate = useNavigate()
 
-  const { data: dispositivo } = useQuery<Dispositivo>({
+  const { data: dispositivo, isLoading } = useQuery<Dispositivo>({
     queryKey: ['dispositivo', id],
     queryFn: getDispositivoById,
   })
@@ -106,8 +107,8 @@ const DispositivoDetailsPage = ({ id }: { id: string }) => {
     }
   }
 
-  if (!dispositivo) return <p>Nao encontrado</p>
-
+  if (isLoading) return <LoadingSpinner />
+  if (!dispositivo) return <p>Não encontrado</p>
   return (
     <>
       <Breadcrumb>
