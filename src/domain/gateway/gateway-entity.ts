@@ -1,4 +1,4 @@
-export interface GetGatewayDTO {
+export interface GatewayEntity {
   id: number
   nome: string
   descricao: string

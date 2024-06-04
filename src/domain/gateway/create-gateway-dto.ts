@@ -1,6 +1,6 @@
-export interface GetGatewayDTO {
-  id: number
+export interface CreateGatewayDTO {
   nome: string
   descricao: string
   endereco: string
+  pessoaId: number
 }

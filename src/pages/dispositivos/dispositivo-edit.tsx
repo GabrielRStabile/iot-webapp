@@ -1,8 +1,13 @@
+import { DataTableBasic } from '@/components/data-table-basic'
+import { GoogleMaps } from '@/components/map'
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb'
 import { Button } from '@/components/ui/button'
-import { Save } from 'lucide-react'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
-import { zodResolver } from '@hookform/resolvers/zod'
 import {
   Form,
   FormControl,
@@ -12,8 +17,6 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import { GoogleMaps } from '@/components/map'
 import {
   Select,
   SelectContent,
@@ -22,13 +25,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { useEffect, useState } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import {
-  associateDispositivoWithGateway,
-  getGateways,
-} from '@/domain/gateway/gateway-queries'
+import { Textarea } from '@/components/ui/textarea'
+import { atuadorColumnsAssociation } from '@/domain/atuador/atuador-columns-association'
+import { atuadorColumnsDesassociation } from '@/domain/atuador/atuador-columns-desassociation'
+import { getAtuadores } from '@/domain/atuador/atuador-queries'
+import { GetAtuador } from '@/domain/atuador/get-atuador-dto'
+import Dispositivo from '@/domain/dispositivo/dispositivo-interface'
 import {
   addAtuadores,
   addSensores,
@@ -39,27 +42,26 @@ import {
   removeSensores,
   updateDispositivo,
 } from '@/domain/dispositivo/dispositivo-queries'
-import { Link, useNavigate } from 'react-router-dom'
-import Dispositivo from '@/domain/dispositivo/dispositivo-interface'
-import { GetGateway } from '@/domain/gateway/get-gateway-dto'
-import { GetSensor } from '@/domain/sensor/get-sensor-dto'
-import { DataTableBasic } from '@/components/data-table-basic'
-import { GetAtuador } from '@/domain/atuador/get-atuador-dto'
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb'
 import { UpdateDispositivo } from '@/domain/dispositivo/update-dispositivo-dto'
-import { toast } from 'sonner'
-import { sensorColumnsDesassociation } from '@/domain/sensor/sensor-columns-desassociation'
+import {
+  associateDispositivoWithGateway,
+  getGatewayByPersonId,
+} from '@/domain/gateway/gateway-queries'
+import { GetGatewayDTO } from '@/domain/gateway/get-gateway-dto'
+import { GetSensor } from '@/domain/sensor/get-sensor-dto'
 import { sensorColumnsAssociation } from '@/domain/sensor/sensor-columns-association'
-import { atuadorColumnsDesassociation } from '@/domain/atuador/atuador-columns-desassociation'
-import { atuadorColumnsAssociation } from '@/domain/atuador/atuador-columns-association'
+import { sensorColumnsDesassociation } from '@/domain/sensor/sensor-columns-desassociation'
 import { getSensores } from '@/domain/sensor/sensor-queries'
-import { getAtuadores } from '@/domain/atuador/atuador-queries'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { Save } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { Link, useNavigate } from 'react-router-dom'
+import { toast } from 'sonner'
+import { z } from 'zod'
+import { Card, CardContent, CardTitle } from '../../components/ui/card'
+import { useAuth } from '../../contexts/auth-context'
 
 const DispositivoEditPage = ({ id }: { id: string }) => {
   const [position, setPosition] = useState<
@@ -68,6 +70,7 @@ const DispositivoEditPage = ({ id }: { id: string }) => {
 
   const queryClient = useQueryClient()
   const navigate = useNavigate()
+  const { user } = useAuth()
 
   const { mutateAsync: updateDispositivoFn } = useMutation({
     mutationFn: updateDispositivo,
@@ -129,9 +132,10 @@ const DispositivoEditPage = ({ id }: { id: string }) => {
     queryFn: getDispositivoById,
   })
 
-  const { data: gateways = [] } = useQuery<GetGateway[]>({
+  const { data: gateways = [] } = useQuery<GetGatewayDTO[]>({
     queryKey: ['gateways'],
-    queryFn: getGateways,
+    enabled: !!user,
+    queryFn: () => getGatewayByPersonId(user?.id ?? ''),
   })
 
   const { data: sensoresDispositivo = [] } = useQuery<GetSensor[]>({
@@ -362,9 +366,7 @@ const DispositivoEditPage = ({ id }: { id: string }) => {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="flex justify-between items-center mb-3">
-            <h4 className="scroll-m-20 text-xl font-semibold tracking-tight">
-              {`Editando ${dispositivo?.nome}`}
-            </h4>
+            <h4>{`Editando ${dispositivo?.nome}`}</h4>
             <div className="flex items-center gap-[0.625rem]">
               <Button
                 type="button"
@@ -380,181 +382,190 @@ const DispositivoEditPage = ({ id }: { id: string }) => {
             </div>
           </div>
           <main className="grid grid-cols-2 gap-[0.625rem]">
-            <div className="row-span-2 border border-neutral-200 rounded-md bg-white h-full p-6">
-              <h5 className="text-lg font-semibold mb-[0.625rem]">
-                Informações básicas
-              </h5>
-              <FormField
-                control={form.control}
-                name="nome"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nome</FormLabel>
-                    <FormControl>
-                      <Input type="text" placeholder="" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="descricao"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Descrição</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        className="resize-none max-h-20"
-                        placeholder=""
-                        {...field}
+            <Card className="row-span-2">
+              <CardTitle>Informações básicas</CardTitle>
+              <CardContent>
+                <FormField
+                  control={form.control}
+                  name="nome"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nome</FormLabel>
+                      <FormControl>
+                        <Input type="text" placeholder="" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="descricao"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Descrição</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          className="resize-none max-h-20"
+                          placeholder=""
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="endereco"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Endereço de IP</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="text"
+                          placeholder="000.000.000.000"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="gatewayId"
+                  render={({ field }) => (
+                    <FormItem className="flex items-center">
+                      <FormLabel>Gateway Associado</FormLabel>
+                      <FormControl>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={dispositivo?.gatewayId?.toString()}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Nenhum" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectGroup>
+                              {gateways &&
+                                gateways.map((gateway) => (
+                                  <SelectItem
+                                    key={gateway.id}
+                                    value={`${gateway.id}`}
+                                  >
+                                    {gateway.nome}
+                                  </SelectItem>
+                                ))}
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="local"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Localização</FormLabel>
+                      <FormControl>
+                        <Input type="text" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="mt-[0.625rem]">
+                  <GoogleMaps position={position} setPosition={setPosition} />
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardTitle>Sensores do Dispositivo</CardTitle>
+              <CardContent>
+                <Tabs defaultValue="associated">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="associated">
+                      <span className="truncate">
+                        Associados ao Dispositivo
+                      </span>
+                    </TabsTrigger>
+                    <TabsTrigger value="available">
+                      <span className="truncate">
+                        Disponíveis para Associar
+                      </span>
+                    </TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="associated">
+                    {
+                      <DataTableBasic
+                        data={associatedSensores}
+                        columns={sensorColumnsDesassociation}
+                        meta={{
+                          onDesassociation: handleDisassociateSensor,
+                        }}
                       />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="endereco"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Endereço de IP</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="text"
-                        placeholder="000.000.000.000"
-                        {...field}
+                    }
+                  </TabsContent>
+                  <TabsContent value="available">
+                    {
+                      <DataTableBasic
+                        data={availableSensores}
+                        columns={sensorColumnsAssociation}
+                        meta={{
+                          onAssociation: handleAssociateSensor,
+                        }}
                       />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="gatewayId"
-                render={({ field }) => (
-                  <FormItem className="flex items-center">
-                    <FormLabel>Gateway Associado</FormLabel>
-                    <FormControl>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={dispositivo?.gatewayId?.toString()}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Nenhum" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            {gateways &&
-                              gateways.map((gateway) => (
-                                <SelectItem
-                                  key={gateway.id}
-                                  value={`${gateway.id}`}
-                                >
-                                  {gateway.nome}
-                                </SelectItem>
-                              ))}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="local"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Localização</FormLabel>
-                    <FormControl>
-                      <Input type="text" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <div className="mt-[0.625rem]">
-                <GoogleMaps position={position} setPosition={setPosition} />
-              </div>
-            </div>
-            <div className="border border-neutral-200 rounded-md bg-white h-full p-6">
-              <h5 className="text-lg font-semibold mb-[0.625rem]">
-                Sensores do Dispositivo
-              </h5>
-              <Tabs defaultValue="associated">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="associated">
-                    <span className="truncate">Associados ao Dispositivo</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="available">
-                    <span className="truncate">Disponíveis para Associar</span>
-                  </TabsTrigger>
-                </TabsList>
-                <TabsContent value="associated">
-                  {
-                    <DataTableBasic
-                      data={associatedSensores}
-                      columns={sensorColumnsDesassociation}
-                      meta={{
-                        onDesassociation: handleDisassociateSensor,
-                      }}
-                    />
-                  }
-                </TabsContent>
-                <TabsContent value="available">
-                  {
-                    <DataTableBasic
-                      data={availableSensores}
-                      columns={sensorColumnsAssociation}
-                      meta={{
-                        onAssociation: handleAssociateSensor,
-                      }}
-                    />
-                  }
-                </TabsContent>
-              </Tabs>
-            </div>
-            <div className="border border-neutral-200 rounded-md bg-white h-full p-6">
-              <h5 className="text-lg font-semibold mb-[0.625rem]">
-                Atuadores do Dispositivo
-              </h5>
-              <Tabs defaultValue="associated">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="associated">
-                    <span className="truncate">Associados ao Dispositivo</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="available">
-                    <span className="truncate">Disponíveis para Associar</span>
-                  </TabsTrigger>
-                </TabsList>
-                <TabsContent value="associated">
-                  {
-                    <DataTableBasic
-                      data={associatedAtuadores}
-                      columns={atuadorColumnsDesassociation}
-                      meta={{
-                        onDesassociation: handleDisassociateAtuador,
-                      }}
-                    />
-                  }
-                </TabsContent>
-                <TabsContent value="available">
-                  {
-                    <DataTableBasic
-                      data={availableAtuadores}
-                      columns={atuadorColumnsAssociation}
-                      meta={{
-                        onAssociation: handleAssociateAtuador,
-                      }}
-                    />
-                  }
-                </TabsContent>
-              </Tabs>
-            </div>
+                    }
+                  </TabsContent>
+                </Tabs>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardTitle>Atuadores do Dispositivo</CardTitle>
+              <CardContent>
+                <Tabs defaultValue="associated">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="associated">
+                      <span className="truncate">
+                        Associados ao Dispositivo
+                      </span>
+                    </TabsTrigger>
+                    <TabsTrigger value="available">
+                      <span className="truncate">
+                        Disponíveis para Associar
+                      </span>
+                    </TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="associated">
+                    {
+                      <DataTableBasic
+                        data={associatedAtuadores}
+                        columns={atuadorColumnsDesassociation}
+                        meta={{
+                          onDesassociation: handleDisassociateAtuador,
+                        }}
+                      />
+                    }
+                  </TabsContent>
+                  <TabsContent value="available">
+                    {
+                      <DataTableBasic
+                        data={availableAtuadores}
+                        columns={atuadorColumnsAssociation}
+                        meta={{
+                          onAssociation: handleAssociateAtuador,
+                        }}
+                      />
+                    }
+                  </TabsContent>
+                </Tabs>
+              </CardContent>
+            </Card>
           </main>
         </form>
       </Form>

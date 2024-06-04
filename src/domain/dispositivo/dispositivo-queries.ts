@@ -8,7 +8,7 @@ import { UpdateDispositivo } from './update-dispositivo-dto'
 import { UpdateSensoresDispositivo } from './update-sensor-dispositivo'
 import { UpdateAtuadoresDispositivo } from './update-atuador-dispositivo'
 
-const baseUrl = 'http://localhost:8080/dispositivo'
+const baseUrl = `${import.meta.env.VITE_IOT_API}/dispositivo`
 
 const getDispositivoById = async ({
   queryKey,
@@ -34,7 +34,7 @@ const getAtuadoresByDispositivoId = async ({
   return data
 }
 
-const getDispositivos = async () => {
+const getDispositivos = async (): Promise<Dispositivo[]> => {
   const { data } = await fetchClient().get(baseUrl)
   return data
 }

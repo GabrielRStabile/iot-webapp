@@ -1,5 +1,5 @@
-export interface GetGatewayDTO {
-  id: number
+export interface UpdateGatewayDTO {
+  id: string
   nome: string
   descricao: string
   endereco: string

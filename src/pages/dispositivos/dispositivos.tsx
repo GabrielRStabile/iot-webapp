@@ -1,8 +1,8 @@
 import { Outlet, useLocation, useParams } from 'react-router-dom'
 import DispositivoCreatePage from './dispositivo-create'
 import DispositivoDetailsPage from './dispositivo-details'
-import DispositivoListPage from './dispositivo-list'
 import DispositivoEditPage from './dispositivo-edit'
+import DispositivoListPage from './dispositivo-list'
 
 const DispositivosPage = () => {
   const path = useLocation()
@@ -32,7 +32,7 @@ const DispositivosPage = () => {
 
   return (
     <>
-      <div className="bg-neutral-50 p-4 h-full">
+      <div className="p-4 h-full w-full">
         <Outlet />
         {checkRoute()}
       </div>
