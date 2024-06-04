@@ -13,6 +13,9 @@ import App from './pages/app'
 import LoginPage from './pages/auth/login-page'
 import SignUpPage from './pages/auth/signup-page'
 import DispositivosPage from './pages/dispositivos/dispositivos'
+import GatewayCreatePage from './pages/gateways/gateway-create-page'
+import GatewayEditPage from './pages/gateways/gateway-edit-page'
+import GatewaysPage from './pages/gateways/gateways-page'
 import { APIProvider } from '@vis.gl/react-google-maps'
 
 const router = createBrowserRouter([
@@ -50,6 +53,18 @@ const router = createBrowserRouter([
             path: ':dispositivoId/edit',
           },
         ],
+      },
+      {
+        path: 'gateways',
+        element: <GatewaysPage />,
+      },
+      {
+        path: 'gateways/new',
+        element: <GatewayCreatePage />,
+      },
+      {
+        path: 'gateways/:id/edit',
+        element: <GatewayEditPage />,
       },
     ],
   },

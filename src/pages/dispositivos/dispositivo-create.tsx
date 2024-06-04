@@ -1,8 +1,5 @@
+import { GoogleMaps } from '@/components/map'
 import { Button } from '@/components/ui/button'
-import { CirclePlus } from 'lucide-react'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
-import { zodResolver } from '@hookform/resolvers/zod'
 import {
   Form,
   FormControl,
@@ -12,8 +9,6 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import { GoogleMaps } from '@/components/map'
 import {
   Select,
   SelectContent,
@@ -22,13 +17,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { useEffect, useState } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { Textarea } from '@/components/ui/textarea'
+import { CreateDispositivo } from '@/domain/dispositivo/create-dispositivo-dto'
+import Dispositivo from '@/domain/dispositivo/dispositivo-interface'
+import { createDispositivo } from '@/domain/dispositivo/dispositivo-queries'
 import {
   associateDispositivoWithGateway,
-  getGateways,
+  getGatewayByPersonId,
 } from '@/domain/gateway/gateway-queries'
+import { GetGatewayDTO } from '@/domain/gateway/get-gateway-dto'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { CirclePlus } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { useNavigate } from 'react-router-dom'
+import { z } from 'zod'
+import { useAuth } from '../../contexts/auth-context'
 import {
   addAtuadores,
   addSensores,
@@ -62,6 +68,8 @@ const DispositivoCreatePage = () => {
   const [position, setPosition] = useState<
     google.maps.LatLngLiteral | undefined
   >()
+
+  const { user } = useAuth()
 
   const queryClient = useQueryClient()
   const navigate = useNavigate()
@@ -111,7 +119,7 @@ const DispositivoCreatePage = () => {
 
   const { data: gateways } = useQuery<GetGateway[]>({
     queryKey: ['gateways'],
-    queryFn: getGateways,
+    queryFn: () => getGatewayByPersonId(user?.id ?? ''),
   })
 
   const { data: sensores } = useQuery<GetSensor[]>({
