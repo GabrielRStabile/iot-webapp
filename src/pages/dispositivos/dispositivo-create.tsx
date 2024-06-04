@@ -21,35 +21,30 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 import { CreateDispositivo } from '@/domain/dispositivo/create-dispositivo-dto'
 import Dispositivo from '@/domain/dispositivo/dispositivo-interface'
-import { createDispositivo } from '@/domain/dispositivo/dispositivo-queries'
-import {
-  associateDispositivoWithGateway,
-  getGatewayByPersonId,
-} from '@/domain/gateway/gateway-queries'
-import { GetGatewayDTO } from '@/domain/gateway/get-gateway-dto'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { CirclePlus } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { useNavigate } from 'react-router-dom'
-import { z } from 'zod'
-import { useAuth } from '../../contexts/auth-context'
 import {
   addAtuadores,
   addSensores,
   createDispositivo,
 } from '@/domain/dispositivo/dispositivo-queries'
-import { CreateDispositivo } from '@/domain/dispositivo/create-dispositivo-dto'
-import { Link, useNavigate } from 'react-router-dom'
-import Dispositivo from '@/domain/dispositivo/dispositivo-interface'
-import { GetGateway } from '@/domain/gateway/get-gateway-dto'
+import {
+  associateDispositivoWithGateway,
+  getGatewayByPersonId,
+} from '@/domain/gateway/gateway-queries'
+import { GetGatewayDTO } from '@/domain/gateway/get-gateway-dto'
 import { GetSensor } from '@/domain/sensor/get-sensor-dto'
 import { getSensores } from '@/domain/sensor/sensor-queries'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { CirclePlus } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { Link, useNavigate } from 'react-router-dom'
+import { z } from 'zod'
+import { useAuth } from '../../contexts/auth-context'
 
 import { DataTableBasic } from '@/components/data-table-basic'
-import { GetAtuador } from '@/domain/atuador/get-atuador-dto'
 import { getAtuadores } from '@/domain/atuador/atuador-queries'
+import { GetAtuador } from '@/domain/atuador/get-atuador-dto'
 
 import {
   Breadcrumb,
@@ -58,11 +53,11 @@ import {
   BreadcrumbList,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb'
-import { toast } from 'sonner'
-import { sensorColumnsDesassociation } from '@/domain/sensor/sensor-columns-desassociation'
-import { sensorColumnsAssociation } from '@/domain/sensor/sensor-columns-association'
-import { atuadorColumnsDesassociation } from '@/domain/atuador/atuador-columns-desassociation'
 import { atuadorColumnsAssociation } from '@/domain/atuador/atuador-columns-association'
+import { atuadorColumnsDesassociation } from '@/domain/atuador/atuador-columns-desassociation'
+import { sensorColumnsAssociation } from '@/domain/sensor/sensor-columns-association'
+import { sensorColumnsDesassociation } from '@/domain/sensor/sensor-columns-desassociation'
+import { toast } from 'sonner'
 
 const DispositivoCreatePage = () => {
   const [position, setPosition] = useState<
@@ -117,7 +112,7 @@ const DispositivoCreatePage = () => {
     },
   })
 
-  const { data: gateways } = useQuery<GetGateway[]>({
+  const { data: gateways } = useQuery<GetGatewayDTO[]>({
     queryKey: ['gateways'],
     queryFn: () => getGatewayByPersonId(user?.id ?? ''),
   })

@@ -1,20 +1,8 @@
-import { DataTable } from '@/components/data-table'
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb'
-import ThemeSwitcher from '@/components/ui/theme-switcher'
-import { dispositivoColumns } from '@/domain/dispositivo/dispositivo-columns'
-import { getDispositivos } from '@/domain/dispositivo/dispositivo-queries'
-import { useQuery } from '@tanstack/react-query'
 import { Outlet, useLocation, useParams } from 'react-router-dom'
 import DispositivoCreatePage from './dispositivo-create'
 import DispositivoDetailsPage from './dispositivo-details'
-import DispositivoListPage from './dispositivo-list'
 import DispositivoEditPage from './dispositivo-edit'
+import DispositivoListPage from './dispositivo-list'
 
 const DispositivosPage = () => {
   const path = useLocation()
