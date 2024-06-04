@@ -14,6 +14,9 @@ import LoginPage from './pages/auth/login-page'
 import SignUpPage from './pages/auth/signup-page'
 import DispositivoCreatePage from './pages/dispositivos/dispositivo-create'
 import DispositivosPage from './pages/dispositivos/dispositivos'
+import GatewayCreatePage from './pages/gateways/gateway-create-page'
+import GatewayEditPage from './pages/gateways/gateway-edit-page'
+import GatewaysPage from './pages/gateways/gateways-page'
 
 const router = createBrowserRouter([
   {
@@ -45,6 +48,18 @@ const router = createBrowserRouter([
             element: <DispositivoCreatePage />,
           },
         ],
+      },
+      {
+        path: 'gateways',
+        element: <GatewaysPage />,
+      },
+      {
+        path: 'gateways/new',
+        element: <GatewayCreatePage />,
+      },
+      {
+        path: 'gateways/:id/edit',
+        element: <GatewayEditPage />,
       },
     ],
   },
