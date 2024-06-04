@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import { z } from 'zod'
@@ -17,7 +18,7 @@ import AuthHeader from './components/auth-header'
 import AuthMain from './components/auth-main'
 
 export default function LoginPage() {
-  const { login } = useAuth()
+  const { login, signed } = useAuth()
   const navigate = useNavigate()
 
   const formSchema = z.object({
@@ -39,6 +40,12 @@ export default function LoginPage() {
       navigate('/dashboard', { replace: true })
     }
   }
+
+  useEffect(() => {
+    if (signed) {
+      navigate('/dashboard', { replace: true })
+    }
+  })
 
   return (
     <div className="flex flex-col h-screen">
