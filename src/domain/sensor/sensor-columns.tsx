@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ColumnDef } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
+import { ColumnDef } from '@tanstack/react-table'
 import { Edit, Link, Unlink } from 'lucide-react'
-import { GetSensor } from './get-sensor-dto'
+import { GetSensorDTO } from './get-sensor-dto'
 
-export const sensorColumns: ColumnDef<GetSensor>[] = [
+export const sensorColumns: ColumnDef<GetSensorDTO>[] = [
   {
     accessorKey: 'nome',
     header: 'Nome',

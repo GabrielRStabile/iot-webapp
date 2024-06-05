@@ -1,11 +1,39 @@
 import fetchClient from '@/services/fetch-client'
-import { GetSensor } from './get-sensor-dto'
+import { CreateSensorDTO } from './create-sensor-dto'
+import { GetSensorDTO } from './get-sensor-dto'
+import Leitura from './leitura'
+import { UpdateSensorDTO } from './update-sensor-dto'
 
-const baseUrl = 'http://localhost:8080/sensor'
+const baseUrl = `${import.meta.env.VITE_IOT_API}/sensor`
 
-const getSensores = async (): Promise<GetSensor[]> => {
+const getSensores = async (): Promise<GetSensorDTO[]> => {
   const { data } = await fetchClient().get(baseUrl)
   return data
 }
 
-export { getSensores }
+const getLeiturasSensor = async (sensorId: string): Promise<Leitura[]> => {
+  const { data } = await fetchClient().get(`${baseUrl}/${sensorId}/leitura`)
+  return data
+}
+
+const createSensor = async (sensor: CreateSensorDTO): Promise<GetSensorDTO> => {
+  const { data } = await fetchClient().post(baseUrl, sensor)
+  return data
+}
+
+const updateSensor = async (sensor: UpdateSensorDTO): Promise<GetSensorDTO> => {
+  const { data } = await fetchClient().put(`${baseUrl}/${sensor.id}`, sensor)
+  return data
+}
+
+const deleteSensor = async (sensorId: string): Promise<void> => {
+  await fetchClient().delete(`${baseUrl}/${sensorId}`)
+}
+
+export {
+  createSensor,
+  deleteSensor,
+  getLeiturasSensor,
+  getSensores,
+  updateSensor,
+}
