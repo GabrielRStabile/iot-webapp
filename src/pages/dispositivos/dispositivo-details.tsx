@@ -15,19 +15,21 @@ import {
   getDispositivoById,
   getSensoresByDispositivoId,
 } from '@/domain/dispositivo/dispositivo-queries'
-import { getGatewayById } from '@/domain/gateway/gateway-queries'
-import { GetGatewayDTO } from '@/domain/gateway/get-gateway-dto'
 import { GetSensorDTO } from '@/domain/sensor/get-sensor-dto'
 import { sensorColumns } from '@/domain/sensor/sensor-columns'
 import { useQuery } from '@tanstack/react-query'
 import { Map, Marker } from '@vis.gl/react-google-maps'
 import { Link, useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardTitle } from '../../components/ui/card'
+import { GetGatewayDTO } from '@/domain/gateway/get-gateway-dto'
+import { getGatewayById } from '@/domain/gateway/gateway-queries'
+import { LoadingSpinner } from '@/components/ui/loading-spinner'
+import NotFound from '../not-found'
 
 const DispositivoDetailsPage = ({ id }: { id: string }) => {
   const navigate = useNavigate()
 
-  const { data: dispositivo } = useQuery<Dispositivo>({
+  const { data: dispositivo, isLoading } = useQuery<Dispositivo>({
     queryKey: ['dispositivo', id],
     queryFn: getDispositivoById,
   })
@@ -106,8 +108,13 @@ const DispositivoDetailsPage = ({ id }: { id: string }) => {
     }
   }
 
-  if (!dispositivo) return <p>Nao encontrado</p>
-
+  if (isLoading)
+    return (
+      <div className="h-screen flex justify-center items-center">
+        <LoadingSpinner />
+      </div>
+    )
+  if (!dispositivo) return <NotFound />
   return (
     <>
       <Breadcrumb>

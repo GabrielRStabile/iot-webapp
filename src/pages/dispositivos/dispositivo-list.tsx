@@ -16,6 +16,7 @@ import {
   CardDescription,
   CardTitle,
 } from '../../components/ui/card'
+import { LoadingSpinner } from '@/components/ui/loading-spinner'
 
 const DispositivoListPage = () => {
   const { data = [], isLoading } = useQuery({
@@ -23,7 +24,7 @@ const DispositivoListPage = () => {
     queryFn: getDispositivos,
   })
 
-  if (isLoading) return <p>carregando...</p>
+  if (isLoading) return <LoadingSpinner />
 
   return (
     <>

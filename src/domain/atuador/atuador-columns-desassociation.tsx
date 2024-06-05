@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ColumnDef } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
-import { Edit, Unlink } from 'lucide-react'
+import { Unlink } from 'lucide-react'
 import { GetAtuador } from './get-atuador-dto'
+import AtuadoresEditSheet from '@/pages/atuadores/components/atuadores-edit-sheet'
 
 export const atuadorColumnsDesassociation: ColumnDef<GetAtuador>[] = [
   {
@@ -25,9 +26,7 @@ export const atuadorColumnsDesassociation: ColumnDef<GetAtuador>[] = [
           >
             <Unlink size="16" />
           </Button>
-          <Button type="button" variant="outline" className="py-2 px-3">
-            <Edit size="16" />
-          </Button>
+          <AtuadoresEditSheet id={`${row.original.id}`} />
         </div>
       )
     },

@@ -18,6 +18,7 @@ import { GetAtuador } from '@/domain/atuador/get-atuador-dto'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import AtuadoresCreateSheet from './components/atuadores-create-sheet'
+import { LoadingSpinner } from '@/components/ui/loading-spinner'
 
 const AtuadoresListPage = () => {
   const { data: atuadores = [], isLoading } = useQuery<GetAtuador[]>({
@@ -25,7 +26,7 @@ const AtuadoresListPage = () => {
     queryFn: getAtuadores,
   })
 
-  if (isLoading) return <p>carregando...</p>
+  if (isLoading) return <LoadingSpinner />
 
   return (
     <>

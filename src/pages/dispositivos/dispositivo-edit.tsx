@@ -62,6 +62,8 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 import { Card, CardContent, CardTitle } from '../../components/ui/card'
 import { useAuth } from '../../contexts/auth-context'
+import { LoadingSpinner } from '@/components/ui/loading-spinner'
+import NotFound from '../not-found'
 
 const DispositivoEditPage = ({ id }: { id: string }) => {
   const [position, setPosition] = useState<
@@ -334,10 +336,13 @@ const DispositivoEditPage = ({ id }: { id: string }) => {
     }
   }, [form, dispositivo])
 
-  if (isLoading) {
-    return <div>carregando...</div>
-  }
-
+  if (isLoading)
+    return (
+      <div className="h-screen flex justify-center items-center">
+        <LoadingSpinner />
+      </div>
+    )
+  if (!dispositivo) return <NotFound />
   return (
     <div>
       <Breadcrumb>
@@ -544,26 +549,22 @@ const DispositivoEditPage = ({ id }: { id: string }) => {
                     </TabsTrigger>
                   </TabsList>
                   <TabsContent value="associated">
-                    {
-                      <DataTableBasic
-                        data={associatedAtuadores}
-                        columns={atuadorColumnsDesassociation}
-                        meta={{
-                          onDesassociation: handleDisassociateAtuador,
-                        }}
-                      />
-                    }
+                    <DataTableBasic
+                      data={associatedAtuadores}
+                      columns={atuadorColumnsDesassociation}
+                      meta={{
+                        onDesassociation: handleDisassociateAtuador,
+                      }}
+                    />
                   </TabsContent>
                   <TabsContent value="available">
-                    {
-                      <DataTableBasic
-                        data={availableAtuadores}
-                        columns={atuadorColumnsAssociation}
-                        meta={{
-                          onAssociation: handleAssociateAtuador,
-                        }}
-                      />
-                    }
+                    <DataTableBasic
+                      data={availableAtuadores}
+                      columns={atuadorColumnsAssociation}
+                      meta={{
+                        onAssociation: handleAssociateAtuador,
+                      }}
+                    />
                   </TabsContent>
                 </Tabs>
               </CardContent>
