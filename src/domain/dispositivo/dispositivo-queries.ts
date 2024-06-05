@@ -108,7 +108,15 @@ const removeAtuadores = async ({
 }
 
 export {
-  addAtuadores, addSensores, createDispositivo, deleteDispositivo, getAtuadoresByDispositivoId, getDispositivoById,
-  getDispositivos, getSensoresByDispositivoId, removeAtuadores, removeSensores, updateDispositivo
+  addAtuadores,
+  addSensores,
+  createDispositivo,
+  deleteDispositivo,
+  getAtuadoresByDispositivoId,
+  getDispositivoById,
+  getDispositivos,
+  getSensoresByDispositivoId,
+  removeAtuadores,
+  removeSensores,
+  updateDispositivo,
 }
-

@@ -129,7 +129,9 @@ const DispositivoCreatePage = () => {
   })
 
   const [availableSensores, setAvailableSensores] = useState<GetSensorDTO[]>([])
-  const [associatedSensores, setAssociatedSensores] = useState<GetSensorDTO[]>([])
+  const [associatedSensores, setAssociatedSensores] = useState<GetSensorDTO[]>(
+    [],
+  )
 
   const [availableAtuadores, setAvailableAtuadores] = useState<GetAtuador[]>([])
   const [associatedAtuadores, setAssociatedAtuadores] = useState<GetAtuador[]>(

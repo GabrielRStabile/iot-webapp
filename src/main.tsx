@@ -71,6 +71,8 @@ const router = createBrowserRouter([
       {
         path: 'sensores',
         element: <SensoresPage />,
+      },
+      {
         path: 'atuadores',
         element: <AtuadoresPage />,
       },
