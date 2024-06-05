@@ -1,8 +1,8 @@
-interface GetSensor {
+interface GetSensorDTO {
   id: number
   nome: string
   tipo: string
   dispositivoId: number | null
 }
 
-export type { GetSensor }
+export type { GetSensorDTO }

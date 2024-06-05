@@ -48,7 +48,7 @@ import {
   getGatewayByPersonId,
 } from '@/domain/gateway/gateway-queries'
 import { GetGatewayDTO } from '@/domain/gateway/get-gateway-dto'
-import { GetSensor } from '@/domain/sensor/get-sensor-dto'
+import { GetSensorDTO } from '@/domain/sensor/get-sensor-dto'
 import { sensorColumnsAssociation } from '@/domain/sensor/sensor-columns-association'
 import { sensorColumnsDesassociation } from '@/domain/sensor/sensor-columns-desassociation'
 import { getSensores } from '@/domain/sensor/sensor-queries'
@@ -139,7 +139,7 @@ const DispositivoEditPage = ({ id }: { id: string }) => {
     queryFn: () => getGatewayByPersonId(user?.id ?? ''),
   })
 
-  const { data: sensoresDispositivo = [] } = useQuery<GetSensor[]>({
+  const { data: sensoresDispositivo = [] } = useQuery<GetSensorDTO[]>({
     queryKey: ['sensoresDispositivo', id],
     queryFn: getSensoresByDispositivoId,
   })
@@ -149,7 +149,7 @@ const DispositivoEditPage = ({ id }: { id: string }) => {
     queryFn: getAtuadoresByDispositivoId,
   })
 
-  const { data: allSensores = [] } = useQuery<GetSensor[]>({
+  const { data: allSensores = [] } = useQuery<GetSensorDTO[]>({
     queryKey: ['sensores'],
     queryFn: getSensores,
   })
@@ -159,10 +159,12 @@ const DispositivoEditPage = ({ id }: { id: string }) => {
     queryFn: getAtuadores,
   })
 
-  const [availableSensores, setAvailableSensores] = useState<GetSensor[]>([])
-  const [associatedSensores, setAssociatedSensores] = useState<GetSensor[]>([])
+  const [availableSensores, setAvailableSensores] = useState<GetSensorDTO[]>([])
+  const [associatedSensores, setAssociatedSensores] = useState<GetSensorDTO[]>(
+    [],
+  )
   const [initialAssociatedSensores, setInitialAssociatedSensores] = useState<
-    GetSensor[]
+    GetSensorDTO[]
   >([])
 
   const [availableAtuadores, setAvailableAtuadores] = useState<GetAtuador[]>([])
@@ -173,12 +175,12 @@ const DispositivoEditPage = ({ id }: { id: string }) => {
     GetAtuador[]
   >([])
 
-  const handleAssociateSensor = (sensor: GetSensor) => {
+  const handleAssociateSensor = (sensor: GetSensorDTO) => {
     setAvailableSensores((prev) => prev.filter((s) => s.id !== sensor.id))
     setAssociatedSensores((prev) => [...prev, sensor])
   }
 
-  const handleDisassociateSensor = (sensor: GetSensor) => {
+  const handleDisassociateSensor = (sensor: GetSensorDTO) => {
     setAssociatedSensores((prev) => prev.filter((s) => s.id !== sensor.id))
     setAvailableSensores((prev) => [...prev, sensor])
   }

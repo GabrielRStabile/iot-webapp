@@ -1,4 +1,5 @@
 import { QueryClientProvider } from '@tanstack/react-query'
+import { APIProvider } from '@vis.gl/react-google-maps'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
@@ -10,14 +11,14 @@ import { AuthProvider } from './contexts/auth-context'
 import './index.css'
 import { queryClient } from './lib/react-query'
 import App from './pages/app'
+import AtuadoresPage from './pages/atuadores/atuadores'
 import LoginPage from './pages/auth/login-page'
 import SignUpPage from './pages/auth/signup-page'
 import DispositivosPage from './pages/dispositivos/dispositivos'
 import GatewayCreatePage from './pages/gateways/gateway-create-page'
 import GatewayEditPage from './pages/gateways/gateway-edit-page'
 import GatewaysPage from './pages/gateways/gateways-page'
-import { APIProvider } from '@vis.gl/react-google-maps'
-import AtuadoresPage from './pages/atuadores/atuadores'
+import SensoresPage from './pages/sensores/sensores-page'
 
 const router = createBrowserRouter([
   {
@@ -66,6 +67,10 @@ const router = createBrowserRouter([
       {
         path: 'gateways/:id/edit',
         element: <GatewayEditPage />,
+      },
+      {
+        path: 'sensores',
+        element: <SensoresPage />,
       },
       {
         path: 'atuadores',

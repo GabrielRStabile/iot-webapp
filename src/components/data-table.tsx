@@ -34,7 +34,7 @@ import {
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
-  dataType: 'dispositivo' | 'gateway' | 'sensor' | 'atuador'
+  dataType: 'dispositivo' | 'gateway' | 'sensor' | 'atuador' | 'leitura'
   isLoading?: boolean
   hideHeadingButtons?: boolean
   meta?: TableMeta<TData>
@@ -74,6 +74,7 @@ export function DataTable<TData, TValue>({
     gateway: 'gateways',
     sensor: 'sensores',
     atuador: 'atuadores',
+    leitura: 'leituras',
   }
 
   const navigate = useNavigate()
@@ -159,13 +160,15 @@ export function DataTable<TData, TValue>({
                         Que tal deixar isso aqui menos vazio e começar a
                         adicionar seus {types[dataType]}?
                       </span>
-                      <Button
-                        className="capitalize"
-                        onClick={() => navigate('./new')}
-                      >
-                        <CirclePlus className="mr-2" size="16" />
-                        Adicionar {dataType}
-                      </Button>
+                      {customAddButton || (
+                        <Button
+                          className="capitalize"
+                          onClick={() => navigate('./new')}
+                        >
+                          <CirclePlus className="mr-2" size="16" />
+                          Adicionar {dataType}
+                        </Button>
+                      )}
                     </div>
                   </TableCell>
                 </TableRow>
