@@ -541,26 +541,22 @@ const DispositivoEditPage = ({ id }: { id: string }) => {
                     </TabsTrigger>
                   </TabsList>
                   <TabsContent value="associated">
-                    {
-                      <DataTableBasic
-                        data={associatedAtuadores}
-                        columns={atuadorColumnsDesassociation}
-                        meta={{
-                          onDesassociation: handleDisassociateAtuador,
-                        }}
-                      />
-                    }
+                    <DataTableBasic
+                      data={associatedAtuadores}
+                      columns={atuadorColumnsDesassociation}
+                      meta={{
+                        onDesassociation: handleDisassociateAtuador,
+                      }}
+                    />
                   </TabsContent>
                   <TabsContent value="available">
-                    {
-                      <DataTableBasic
-                        data={availableAtuadores}
-                        columns={atuadorColumnsAssociation}
-                        meta={{
-                          onAssociation: handleAssociateAtuador,
-                        }}
-                      />
-                    }
+                    <DataTableBasic
+                      data={availableAtuadores}
+                      columns={atuadorColumnsAssociation}
+                      meta={{
+                        onAssociation: handleAssociateAtuador,
+                      }}
+                    />
                   </TabsContent>
                 </Tabs>
               </CardContent>
