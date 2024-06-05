@@ -63,6 +63,7 @@ import { z } from 'zod'
 import { Card, CardContent, CardTitle } from '../../components/ui/card'
 import { useAuth } from '../../contexts/auth-context'
 import { LoadingSpinner } from '@/components/ui/loading-spinner'
+import NotFound from '../not-found'
 
 const DispositivoEditPage = ({ id }: { id: string }) => {
   const [position, setPosition] = useState<
@@ -335,8 +336,13 @@ const DispositivoEditPage = ({ id }: { id: string }) => {
     }
   }, [form, dispositivo])
 
-  if (isLoading) return <LoadingSpinner />
-
+  if (isLoading)
+    return (
+      <div className="h-screen flex justify-center items-center">
+        <LoadingSpinner />
+      </div>
+    )
+  if (!dispositivo) return <NotFound />
   return (
     <div>
       <Breadcrumb>

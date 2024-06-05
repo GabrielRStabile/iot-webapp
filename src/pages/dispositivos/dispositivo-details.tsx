@@ -24,6 +24,7 @@ import { Card, CardContent, CardTitle } from '../../components/ui/card'
 import { GetGatewayDTO } from '@/domain/gateway/get-gateway-dto'
 import { getGatewayById } from '@/domain/gateway/gateway-queries'
 import { LoadingSpinner } from '@/components/ui/loading-spinner'
+import NotFound from '../not-found'
 
 const DispositivoDetailsPage = ({ id }: { id: string }) => {
   const navigate = useNavigate()
@@ -107,8 +108,13 @@ const DispositivoDetailsPage = ({ id }: { id: string }) => {
     }
   }
 
-  if (isLoading) return <LoadingSpinner />
-  if (!dispositivo) return <p>Não encontrado</p>
+  if (isLoading)
+    return (
+      <div className="h-screen flex justify-center items-center">
+        <LoadingSpinner />
+      </div>
+    )
+  if (!dispositivo) return <NotFound />
   return (
     <>
       <Breadcrumb>
