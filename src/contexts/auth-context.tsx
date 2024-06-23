@@ -126,6 +126,9 @@ export const AuthProvider = ({ children }: AuthContextProviderProps) => {
 
   function logout() {
     setUser(null)
+
+    sessionStorage.removeItem('@App:user')
+    sessionStorage.removeItem('@App:token')
   }
 
   return (
