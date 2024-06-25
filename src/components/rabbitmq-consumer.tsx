@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react'
 // import { connect } from 'amqplib'
 // import SockJS from 'sockjs-client'
 // import Stomp from 'stompjs'
-import { toast, Toaster } from 'sonner'
 import { useAuth } from '@/contexts/auth-context'
 import { StompSessionProvider, useSubscription } from 'react-stomp-hooks'
+import { Toaster, toast } from 'sonner'
 // const RabbitMQConsumer = () => {
 //   const { signed } = useAuth()
 
@@ -49,7 +49,7 @@ const RabbitMQConsumer = () => {
   if (!signed || !token) return null
   return (
     <StompSessionProvider
-      url={'ws://localhost/spring/ws'}
+      url={'ws://iot-spring-api.azurewebsites.net/ws'}
       connectHeaders={{ Authorization: `Bearer ${token}` }}
     >
       <RabbitSubscriber />
