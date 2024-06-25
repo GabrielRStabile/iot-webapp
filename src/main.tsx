@@ -19,6 +19,7 @@ import GatewayCreatePage from './pages/gateways/gateway-create-page'
 import GatewayEditPage from './pages/gateways/gateway-edit-page'
 import GatewaysPage from './pages/gateways/gateways-page'
 import SensoresPage from './pages/sensores/sensores-page'
+import RabbitMQConsumer from './components/rabbitmq-consumer'
 
 const router = createBrowserRouter([
   {
@@ -88,6 +89,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           <TooltipProvider>
             <AuthProvider>
               <RouterProvider router={router} />
+              <RabbitMQConsumer />
               <Toaster />
             </AuthProvider>
           </TooltipProvider>
