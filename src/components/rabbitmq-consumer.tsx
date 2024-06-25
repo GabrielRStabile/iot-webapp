@@ -46,6 +46,7 @@ const RabbitMQConsumer = () => {
     }
   }, [signed])
 
+  if (!signed || !token) return null
   return (
     <StompSessionProvider
       url={'ws://localhost/spring/ws'}
